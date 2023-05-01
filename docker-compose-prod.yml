@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   db:
     image: postgres
@@ -9,9 +11,10 @@ services:
       - POSTGRES_PASSWORD=postgres
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: gunicorn --bind 0.0.0.0:8000 django_blog_backend.wsgi
     volumes:
       - .:/code
+      - static_volume:/code/staticfiles
     expose:
     - 8000
     environment:
@@ -23,8 +26,11 @@ services:
   nginx: 
     build: ./nginx
     volumes:
-      - static_volume:/home/app/web/staticfiles
+      - static_volume:/code/staticfiles
     ports:
-      - 1337:80
+      - 8000:80
     depends_on:
       - web
+volumes:
+  postgres_data:
+  static_volume:
