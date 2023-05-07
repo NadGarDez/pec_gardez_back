@@ -17,6 +17,8 @@ services:
       - static_volume:/code/staticfiles
     expose:
     - 8000
+    env_file:
+      - ./.env.prod
     environment:
       - POSTGRES_NAME=postgres
       - POSTGRES_USER=postgres
@@ -28,7 +30,7 @@ services:
     volumes:
       - static_volume:/code/staticfiles
     ports:
-      - 8000:80
+      - 80:80
     depends_on:
       - web
 volumes:
