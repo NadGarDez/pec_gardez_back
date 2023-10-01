@@ -4,7 +4,10 @@ from rest_framework import routers
 
 
 urlpatterns = [
-    path("books/", views.listBook),
-    path("articles/", views.listArticles),
-    path("appointment_types/", views.appointmentTypeList)
+    path("books/", views.BookList),
+    path("book/<int:pk>", views.BookInstance),
+    path("articles/", views.ArticleList),
+    path("article/<int:pk>", views.ArticleInstance),
+    path("appointment_types/", views.appointmentTypeList),
+    path("appointment_type/<int:pk>", views.AppointmentTypeInstance)
 ]
