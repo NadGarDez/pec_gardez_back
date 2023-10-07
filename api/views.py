@@ -3,6 +3,7 @@ from .serializers import BookModelSerializer, ArticleModelSerializer, Appointmen
 from rest_framework import viewsets, status, generics, mixins
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 from .models import Book, Article, Appointment_type
 
 
@@ -96,3 +97,16 @@ class AppointmentTypeInstance(mixins.RetrieveModelMixin, generics.GenericAPIView
 
     def get(self, request,*args, **kwargs):
         return self.retrieve(self, request,*args, **kwargs)
+    
+
+
+@api_view(['get'])
+def index1(request, format=None):
+    return Response({
+        'books':reverse('books', request=request,format=format),
+        'articles':reverse('articles', request=request, format=format)
+    })
+
+
+
+# in the next practice we are going to use the relationships tool in django rest framework to serialize model relationship fields.
