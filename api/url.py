@@ -17,5 +17,9 @@ urlpatterns = [
     path("user/<int:pk>", views.User_InfoInstance.as_view(), name="user"),
     path("social_media/", views.Social_mediaList.as_view(), name="social_media"), # should filter by owner
     path("phone_numbers/", views.Phone_numberList.as_view(), name="phone_numbers"), # should filter by owner
-     path("tags/", views.TagList.as_view(), name="tags"), # it's probably this endpoint be unused
+    path("tags/", views.TagList.as_view(), name="tags"), # it's probably this endpoint be unused
+    path("writers/", views.WriterList.as_view(), name="writers"),
+    path("writer/<int:pk>", views.WriterInstance.as_view(),name="writer"),
+    path("payments/", views.PaymentList.as_view(), name="payments"),
+    path("payment/<int:pk>", views.PayInstance.as_view(),  name="payment")
 ]
