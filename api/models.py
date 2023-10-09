@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
 # Create your models here.
-class Writer(models.Model):
+class Writer(models.Model): # listo el serializer
     id = models.AutoField(primary_key=True)
     first_name = models.CharField(max_length=255, blank=True)
     last_name = models.CharField(max_length=255, blank=True)
@@ -15,13 +15,13 @@ class Writer(models.Model):
         else:
             return self.first_name
 
-class Tag(models.Model):
+class Tag(models.Model): #listo el serializer
     id = models.AutoField(primary_key=True)
     tag_name = models.CharField(max_length=50)
     def __str__(self):
         return self.tag_name
 
-class Article(models.Model):
+class Article(models.Model): # listo el serializer
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=50, null=False, default="The Article title")
     tags = models.ManyToManyField(Tag)
@@ -31,7 +31,7 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
-class Book(models.Model):
+class Book(models.Model): # listo el serializer
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=50, null=False, default="The Book title")
     tags = models.ManyToManyField(Tag)
@@ -42,7 +42,7 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
-class Slot(models.Model):
+class Slot(models.Model): # listo el serializer
     id = models.AutoField(primary_key=True)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
@@ -51,7 +51,7 @@ class Slot(models.Model):
     def __str__(self):
         return "Slot " +  str(self.id)
 
-class Appointment_type(models.Model):
+class Appointment_type(models.Model): # listo el serializer
     options =[
         ("usd", "USD (US Dollar)"),
         ("eur", "EUR (Euro)"),
@@ -65,7 +65,7 @@ class Appointment_type(models.Model):
     def __str__(self):
         return self.product_name
 
-class Pay_method(models.Model):
+class Pay_method(models.Model): # listo el serializer
     id = models.AutoField(primary_key=True)
     method_name = models.CharField(max_length=50)
     bank_name = models.CharField(max_length=50)
@@ -76,7 +76,7 @@ class Pay_method(models.Model):
         return "Pay method: "+ self.method_name
 
 
-class Payment(models.Model):
+class Payment(models.Model): # listo el serializer
     id = models.AutoField(primary_key=True)
     method = models.ForeignKey(Pay_method,on_delete=models.CASCADE)
     transaction_code = models.CharField(max_length=255)
@@ -84,25 +84,25 @@ class Payment(models.Model):
     def __str__(self):
         return "Payment: " + id
 
-class Appointment(models.Model):
+class Appointment(models.Model): # listo el serializer
     id = models.AutoField(primary_key=True)
     host = models.ForeignKey(User,on_delete=models.CASCADE, related_name="host_user")
     client = models.ForeignKey(User,on_delete=models.CASCADE, related_name="client_user")
     slot = models.OneToOneField(Slot, on_delete=models.CASCADE)
-    pay_reference = models.OneToOneField(Payment, on_delete=models.CASCADE)
+    pay_reference = models.OneToOneField(Payment, on_delete=models.CASCADE, blank=True, null=True)
     meet_url = models.URLField(max_length=255)
     appointment_type = models.ForeignKey(Appointment_type,on_delete=models.CASCADE)
     def __str__(self):
         return "Slot: " + str(self.id)
 
-class Role(models.Model):
+class Role(models.Model): # listo el serializer
     id = models.AutoField(primary_key=True)
     role_name = models.CharField(max_length=50)
     def __str__(self):
         return self.role_name
 
 
-class User_Info(models.Model):
+class User_Info(models.Model): # listo el serializer
     id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     first_name = models.CharField(max_length=50)
@@ -114,7 +114,7 @@ class User_Info(models.Model):
     def __str__(self):
         return self.first_name
 
-class Social_media(models.Model):
+class Social_media(models.Model): # listo serializer
     id = models.AutoField(primary_key=True)
     platform = models.CharField(max_length=255)
     user_name = models.CharField(max_length=255)
