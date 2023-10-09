@@ -4,7 +4,7 @@ from .models import Book, Article,Appointment_type, Writer, Tag, Writer, Role, S
 from django.contrib.auth.models import User
 
 
-class Pay_MethodModelSerializer(serializers.HyperlinkedModelSerializer):
+class Pay_MethodModelSerializer(serializers.HyperlinkedModelSerializer):# listo el view
     class Meta:
         model = Pay_method
         fields = ['id','method_name','bank_name','bank_code','owner_identification','owner_name']
@@ -13,7 +13,7 @@ class Pay_MethodModelSerializer(serializers.HyperlinkedModelSerializer):
 class RoleModelSerializer(serializers.HyperlinkedModelSerializer): # listo el view
     class Meta:
         model = Role
-        fields = ['rol_name', 'id']
+        fields = ['role_name', 'id']
 
 class SlotModelSerializer(serializers.HyperlinkedModelSerializer):# listo el view
     class Meta:

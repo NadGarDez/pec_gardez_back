@@ -62,7 +62,7 @@ class User_InfoInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):
     serializer_class = User_infoModelSerializer
 
     def get(self, request,*args, **kwargs):
-        return self.retrive(self, request,*args, **kwargs)
+        return self.retrieve(self, request,*args, **kwargs)
     
 class Social_mediaList(generics.ListAPIView): # shold list filtering by the owner 
     queryset = Social_media.objects.all()
@@ -85,13 +85,13 @@ class WriterInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):
     serializer_class = WriterModelSerializer
 
     def get(self, request,*args, **kwargs):
-        return self.retrive(self, request,*args, **kwargs)
+        return self.retrieve(self, request,*args, **kwargs)
     
 class SlotList(generics.ListAPIView): # should filter by date, avalability , and owner
     queryset = Slot.objects.all()
     serializer_class = SlotModelSerializer
 
-class PaymentList(generics.ListAPIView):
+class PaymentList(generics.ListAPIView): # should filter by date, owner and some filters more
     queryset = Payment.objects.all()
     serializer_class = PaymentModelSerializer
 
@@ -100,7 +100,7 @@ class PayInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):
     serializer_class = PaymentModelSerializer
 
     def get(self, request,*args, **kwargs):
-        return self.retrive(self, request,*args, **kwargs)
+        return self.retrieve(self, request,*args, **kwargs)
 
 
 
