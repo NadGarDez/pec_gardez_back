@@ -10,47 +10,47 @@ class Pay_MethodModelSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id','method_name','bank_name','bank_code','owner_identification','owner_name']
 
 
-class RoleModelSerializer(serializers.HyperlinkedModelSerializer):
+class RoleModelSerializer(serializers.HyperlinkedModelSerializer): # listo el view
     class Meta:
         model = Role
         fields = ['rol_name', 'id']
 
-class SlotModelSerializer(serializers.HyperlinkedModelSerializer):
+class SlotModelSerializer(serializers.HyperlinkedModelSerializer):# listo el view
     class Meta:
         model = Slot
         fields = ['id','start_date', 'end_date', 'time_in_minutes', 'available']
 
-class WriterModelSerializer(serializers.HyperlinkedModelSerializer):
+class WriterModelSerializer(serializers.HyperlinkedModelSerializer): # listo el view
     class Meta:
         model = Writer
         fields = ['first_name', 'last_name', 'id']
 
-class TagModelSerializer(serializers.HyperlinkedModelSerializer):
+class TagModelSerializer(serializers.HyperlinkedModelSerializer): # listo el view
     class Meta:
         model = Tag
         fields = ['tag_name', 'id']
 
-class BookModelSerializer(serializers.HyperlinkedModelSerializer):
+class BookModelSerializer(serializers.HyperlinkedModelSerializer): #listo el view
     writers = WriterModelSerializer(many=True)
     tags = TagModelSerializer(many=True)
     class Meta:
         model = Book
         fields= ['id','title', 'principal_image', 'download_url', 'resume', 'writers', 'tags']
 
-class ArticleModelSerializer(serializers.HyperlinkedModelSerializer):
+class ArticleModelSerializer(serializers.HyperlinkedModelSerializer):# listo el view
     writers = WriterModelSerializer(many=True)
     tags = TagModelSerializer(many=True)
     class Meta:
         model = Article
         fields = ['id', 'title', 'principal_image', 'content', 'writers', 'tags']
 
-class AppointmentTypeModelSerializer(serializers.HyperlinkedModelSerializer):
+class AppointmentTypeModelSerializer(serializers.HyperlinkedModelSerializer): # listo el view
     class Meta:
         model = Appointment_type
         fields = ['id','product_name', 'description', 'price', 'currency']
 
 
-class PaymentModelSerializer(serializers.HyperlinkedModelSerializer):
+class PaymentModelSerializer(serializers.HyperlinkedModelSerializer): # listo el view
     method = Pay_MethodModelSerializer()
     product = AppointmentTypeModelSerializer()
     
@@ -58,12 +58,12 @@ class PaymentModelSerializer(serializers.HyperlinkedModelSerializer):
         model = Payment
         fields = ['id','method','transaction_code','product']
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.HyperlinkedModelSerializer): # doesn't need view
     class Meta:
         model = User
         fields = ['username']
 
-class AppointmentModelSerializer(serializers.HyperlinkedModelSerializer):
+class AppointmentModelSerializer(serializers.HyperlinkedModelSerializer): # listo el view
     client = UserSerializer()
     slot = SlotModelSerializer()
     pay_reference = Pay_MethodModelSerializer()
@@ -73,7 +73,7 @@ class AppointmentModelSerializer(serializers.HyperlinkedModelSerializer):
         model = Appointment
         fields = ['id','host','client','slot','pay_reference','meet_url','appointment_type']
 
-class User_infoModelSerializer(serializers.HyperlinkedModelSerializer):
+class User_infoModelSerializer(serializers.HyperlinkedModelSerializer): # listo el serialzer
     
     user = UserSerializer()
     role = RoleModelSerializer()
@@ -82,7 +82,7 @@ class User_infoModelSerializer(serializers.HyperlinkedModelSerializer):
         model = User_Info
         fields = ['id','user','first_name','last_name','user_image','resume','time_zone','role']
 
-class Social_mediaModelSerializer(serializers.HyperlinkedModelSerializer):
+class Social_mediaModelSerializer(serializers.HyperlinkedModelSerializer): # listo el view
     owner = User_infoModelSerializer()
 
     class Meta:
@@ -90,7 +90,7 @@ class Social_mediaModelSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id','platform','user_name','owner','url']
 
 
-class Phone_numberModelSerializer(serializers.HyperlinkedModelSerializer):
+class Phone_numberModelSerializer(serializers.HyperlinkedModelSerializer): # listo el view
     owner = User_infoModelSerializer()
 
     class Meta:
