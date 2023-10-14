@@ -89,13 +89,22 @@ class Social_mediaModelSerializer(serializers.HyperlinkedModelSerializer): # lis
         model = Social_media 
         fields = ['id','platform','user_name','owner','url']
 
-
 class Phone_numberModelSerializer(serializers.HyperlinkedModelSerializer): # listo el view
     owner = User_infoModelSerializer()
 
     class Meta:
         model = Phone_number
         fields = ['id','phone_number','country_code','owner']
+
+class Phone_numberModelPostPutSerializer(serializers.HyperlinkedModelSerializer): # listo el view
+    owner = serializers.PrimaryKeyRelatedField(queryset=User_Info.objects.all())
+
+    class Meta:
+        model = Phone_number
+        fields = ['phone_number','country_code', 'owner']
+
+    
+       
 
     
 
