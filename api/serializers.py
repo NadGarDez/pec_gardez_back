@@ -103,7 +103,12 @@ class Phone_numberModelPostPutSerializer(serializers.HyperlinkedModelSerializer)
         model = Phone_number
         fields = ['phone_number','country_code', 'owner']
 
-    
+class Social_mediaModelPostPutSerializer(serializers.HyperlinkedModelSerializer):
+    owner = serializers.PrimaryKeyRelatedField(queryset=User_Info.objects.all())
+    class Meta:
+        model = Social_media 
+        fields = ['platform','user_name','owner','url']
+
        
 
     
