@@ -109,7 +109,10 @@ class Social_mediaModelPostPutSerializer(serializers.HyperlinkedModelSerializer)
         model = Social_media 
         fields = ['platform','user_name','owner','url']
 
-       
-
+class SlotModelPostPutSerializer(serializers.HyperlinkedModelSerializer):     
+    owner = serializers.PrimaryKeyRelatedField(queryset=User_Info.objects.all())
+    class Meta:
+        model = Slot
+        fields = ['start_date', 'end_date', 'time_in_minutes', 'available', 'owner']
     
 

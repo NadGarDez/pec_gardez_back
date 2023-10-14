@@ -42,15 +42,6 @@ class Book(models.Model): # listo el serializer
     def __str__(self):
         return self.title
 
-class Slot(models.Model): # listo el serializer
-    id = models.AutoField(primary_key=True)
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
-    time_in_minutes = models.IntegerField()
-    available = models.BooleanField(default=True)
-    def __str__(self):
-        return "Slot " +  str(self.id)
-
 class Appointment_type(models.Model): # listo el serializer
     options =[
         ("usd", "USD (US Dollar)"),
@@ -83,17 +74,6 @@ class Payment(models.Model): # listo el serializer
     product =  models.ForeignKey(Appointment_type,on_delete=models.CASCADE)
     def __str__(self):
         return "Payment: " + id
-
-class Appointment(models.Model): # listo el serializer
-    id = models.AutoField(primary_key=True)
-    host = models.ForeignKey(User,on_delete=models.CASCADE, related_name="host_user")
-    client = models.ForeignKey(User,on_delete=models.CASCADE, related_name="client_user")
-    slot = models.OneToOneField(Slot, on_delete=models.CASCADE)
-    pay_reference = models.OneToOneField(Payment, on_delete=models.CASCADE, blank=True, null=True)
-    meet_url = models.URLField(max_length=255)
-    appointment_type = models.ForeignKey(Appointment_type,on_delete=models.CASCADE)
-    def __str__(self):
-        return "Slot: " + str(self.id)
 
 class Role(models.Model): # listo el serializer
     id = models.AutoField(primary_key=True)
@@ -130,3 +110,24 @@ class Phone_number(models.Model):
     owner = models.ForeignKey(User_Info, on_delete=models.CASCADE, related_name='owner')
     def __str__(self):
         return self.phone_number
+
+class Slot(models.Model): # listo el serializer
+    id = models.AutoField(primary_key=True)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    time_in_minutes = models.IntegerField()
+    available = models.BooleanField(default=True)
+    owner = models.ForeignKey(User_Info, on_delete=models.CASCADE, related_name='slot_owner')
+    def __str__(self):
+        return "Slot " +  str(self.id)
+    
+class Appointment(models.Model): # listo el serializer
+    id = models.AutoField(primary_key=True)
+    host = models.ForeignKey(User,on_delete=models.CASCADE, related_name="host_user")
+    client = models.ForeignKey(User,on_delete=models.CASCADE, related_name="client_user")
+    slot = models.OneToOneField(Slot, on_delete=models.CASCADE)
+    pay_reference = models.OneToOneField(Payment, on_delete=models.CASCADE, blank=True, null=True)
+    meet_url = models.URLField(max_length=255)
+    appointment_type = models.ForeignKey(Appointment_type,on_delete=models.CASCADE)
+    def __str__(self):
+        return "Appointment: " + str(self.id)
