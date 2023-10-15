@@ -123,8 +123,8 @@ class Slot(models.Model): # listo el serializer
     
 class Appointment(models.Model): # listo el serializer
     id = models.AutoField(primary_key=True)
-    host = models.ForeignKey(User,on_delete=models.CASCADE, related_name="host_user")
-    client = models.ForeignKey(User,on_delete=models.CASCADE, related_name="client_user")
+    host = models.ForeignKey(User_Info,on_delete=models.CASCADE, related_name="host_user")
+    client = models.ForeignKey(User_Info,on_delete=models.CASCADE, related_name="client_user")
     slot = models.OneToOneField(Slot, on_delete=models.CASCADE)
     pay_reference = models.OneToOneField(Payment, on_delete=models.CASCADE, blank=True, null=True)
     meet_url = models.URLField(max_length=255)

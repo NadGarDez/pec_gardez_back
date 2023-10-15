@@ -10,6 +10,8 @@ urlpatterns = [
     path("article/<int:pk>", views.ArticleInstance.as_view()),
     path("appointment_types/", views.AppointmentTypeList.as_view()),
     path("appointment_type/<int:pk>", views.AppointmentTypeInstance.as_view()),
+    path("appointment/", views.AppointmentInstance.as_view(), name="appointment"),
+    path("appointments/", views.AppointmentList.as_view(), name="appointments"),
     path("roles/", views.RoleList.as_view(), name="roles"),
     path("slots/", views.SlotList.as_view(), name="slots"),
     path("slot/", views.SlotInstance.as_view(), name='slot'),
@@ -25,5 +27,6 @@ urlpatterns = [
     path("writers/", views.WriterList.as_view(), name="writers"),
     path("writer/<int:pk>", views.WriterInstance.as_view(),name="writer"),
     path("payments/", views.PaymentList.as_view(), name="payments"),
-    path("payment/<int:pk>", views.PayInstance.as_view(),  name="payment")
+    path("payment/<int:pk>", views.PayInstance.as_view(),  name="payment"),
+    path("payment/", views.PaymentInstance.as_view(), name='payment_post')
 ]

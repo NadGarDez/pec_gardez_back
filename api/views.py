@@ -1,9 +1,9 @@
 from django.shortcuts import render
-from .serializers import BookModelSerializer, ArticleModelSerializer, AppointmentTypeModelSerializer, RoleModelSerializer, Pay_MethodModelSerializer, User_infoModelSerializer, Social_mediaModelSerializer, Phone_numberModelSerializer, TagModelSerializer, WriterModelSerializer, SlotModelSerializer, PaymentModelSerializer,Phone_numberModelPostPutSerializer,Social_mediaModelPostPutSerializer, SlotModelPostPutSerializer
+from .serializers import BookModelSerializer, ArticleModelSerializer, AppointmentTypeModelSerializer, RoleModelSerializer, Pay_MethodModelSerializer, User_infoModelSerializer, Social_mediaModelSerializer, Phone_numberModelSerializer, TagModelSerializer, WriterModelSerializer, SlotModelSerializer, PaymentModelSerializer,Phone_numberModelPostPutSerializer,Social_mediaModelPostPutSerializer, SlotModelPostPutSerializer, AppointmentPostPutSerializer, Pay_ReferencePostPutModelSerializer,AppointmentModelSerializer
 from rest_framework import viewsets, status, generics, mixins
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Book, Article, Appointment_type, Role, Pay_method, User_Info, Social_media, Phone_number, Tag, Slot, Writer, Payment
+from .models import Book, Article, Appointment_type, Role, Pay_method, User_Info, Social_media, Phone_number, Tag, Slot, Writer, Payment, Appointment
 
 
 class BookList(generics.ListAPIView):
@@ -137,8 +137,23 @@ class PayInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):
     def get(self, request,*args, **kwargs):
         return self.retrieve(self, request,*args, **kwargs)
 
+class PaymentInstance(APIView): # this should be protected
+    def post(self, request,format=None):
+        serializer = Pay_ReferencePostPutModelSerializer(data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class AppointmentInstance(APIView):
+    def post(self, request, format=None):
+        serializer = AppointmentPostPutSerializer(data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-
-
+class AppointmentList(generics.ListAPIView): # should filter by date, owner and some filters more
+    queryset = Appointment.objects.all()
+    serializer_class = AppointmentModelSerializer
 # in the next practice we are going to use the relationships tool in django rest framework to serialize model relationship fields.

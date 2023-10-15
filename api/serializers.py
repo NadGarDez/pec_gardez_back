@@ -49,6 +49,13 @@ class AppointmentTypeModelSerializer(serializers.HyperlinkedModelSerializer): # 
         model = Appointment_type
         fields = ['id','product_name', 'description', 'price', 'currency']
 
+class Pay_ReferencePostPutModelSerializer(serializers.HyperlinkedModelSerializer):
+    method = serializers.PrimaryKeyRelatedField(queryset=Pay_method.objects.all())
+    product = serializers.PrimaryKeyRelatedField(queryset=Appointment_type.objects.all()) 
+    class Meta:
+        model = Payment
+        fields = ['method', 'transaction_code', 'product']
+
 
 class PaymentModelSerializer(serializers.HyperlinkedModelSerializer): # listo el view
     method = Pay_MethodModelSerializer()
@@ -63,16 +70,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer): # doesn't need vie
         model = User
         fields = ['username']
 
-class AppointmentModelSerializer(serializers.HyperlinkedModelSerializer): # listo el view
-    client = UserSerializer()
-    slot = SlotModelSerializer()
-    pay_reference = Pay_MethodModelSerializer()
-    appointment_type = AppointmentTypeModelSerializer()
-
-    class Meta:
-        model = Appointment
-        fields = ['id','host','client','slot','pay_reference','meet_url','appointment_type']
-
 class User_infoModelSerializer(serializers.HyperlinkedModelSerializer): # listo el serialzer
     
     user = UserSerializer()
@@ -81,6 +78,17 @@ class User_infoModelSerializer(serializers.HyperlinkedModelSerializer): # listo 
     class Meta:
         model = User_Info
         fields = ['id','user','first_name','last_name','user_image','resume','time_zone','role']
+
+class AppointmentModelSerializer(serializers.HyperlinkedModelSerializer): # listo el view
+    client = User_infoModelSerializer()
+    host = User_infoModelSerializer()
+    slot = SlotModelSerializer()
+    pay_reference = PaymentModelSerializer()
+    appointment_type = AppointmentTypeModelSerializer()
+
+    class Meta:
+        model = Appointment
+        fields = ['id','host','client','slot','pay_reference','meet_url','appointment_type']
 
 class Social_mediaModelSerializer(serializers.HyperlinkedModelSerializer): # listo el view
     owner = User_infoModelSerializer()
@@ -115,4 +123,16 @@ class SlotModelPostPutSerializer(serializers.HyperlinkedModelSerializer):
         model = Slot
         fields = ['start_date', 'end_date', 'time_in_minutes', 'available', 'owner']
     
+class AppointmentPostPutSerializer(serializers.HyperlinkedModelSerializer):
+    client =  serializers.PrimaryKeyRelatedField(queryset=User_Info.objects.all()) 
+    host = serializers.PrimaryKeyRelatedField(queryset=User_Info.objects.all()) 
+    slot =  serializers.PrimaryKeyRelatedField(queryset=Slot.objects.all()) 
+    pay_reference = serializers.PrimaryKeyRelatedField(queryset=Payment.objects.all()) 
+    appointment_type = serializers.PrimaryKeyRelatedField(queryset=Appointment_type.objects.all()) 
 
+    class Meta:
+        model = Appointment
+        fields = ['host','client','slot','pay_reference','meet_url','appointment_type']
+
+
+# http POST http://localhost:8000/api/appointment/ host=3 client=1 slot=1 meet_url=https://www.google.com appointment_type=1
