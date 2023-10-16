@@ -82,6 +82,13 @@ class Phone_numberInstance(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class Phone_numberInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):
+    queryset = Phone_number.objects.all()
+    serializer_class = Phone_numberModelPostPutSerializer
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
 class Social_mediaInstance(APIView):
     def post(self, request, format=None):
         serializer = Social_mediaModelPostPutSerializer(data = request.data)
@@ -90,6 +97,13 @@ class Social_mediaInstance(APIView):
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class Social_mediaInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):
+    queryset = Social_media.objects.all()
+    serializer_class = Social_mediaModelPostPutSerializer
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
 class SlotInstance(APIView):
     def post(self, request, format=None):
         serializer = SlotModelPostPutSerializer(data = request.data)
@@ -97,6 +111,14 @@ class SlotInstance(APIView):
             serializer.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class SlotInstance_PutPost(mixins.DestroyModelMixin, generics.GenericAPIView):
+    queryset = Slot.objects.all()
+    serializer_class = SlotModelPostPutSerializer
+
+    def delete(self, request, *args, **kargs):
+        return self.destroy(request, *args, **kargs)
+
 
 class TagList(generics.ListAPIView):
     queryset = Tag.objects.all()
@@ -144,7 +166,14 @@ class PaymentInstance(APIView): # this should be protected
             serializer.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+class PaymentInstance_PutPost(mixins.DestroyModelMixin, generics.GenericAPIView):
+    queryset = Payment.objects.all()
+    serializer_class = Pay_ReferencePostPutModelSerializer
+
+    def delete(self, request, *args, **kargs):
+        return self.destroy(request, *args, **kargs)
+
 class AppointmentInstance(APIView):
     def post(self, request, format=None):
         serializer = AppointmentPostPutSerializer(data = request.data)
@@ -152,6 +181,13 @@ class AppointmentInstance(APIView):
             serializer.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AppointmentInstance_PutPost(mixins.DestroyModelMixin, generics.GenericAPIView):
+    queryset = Appointment.objects.all()
+    serializer_class = AppointmentPostPutSerializer
+
+    def delete(self, request, *args, **kargs):
+        return self.destroy(request, *args, **kargs)
 
 class AppointmentList(generics.ListAPIView): # should filter by date, owner and some filters more
     queryset = Appointment.objects.all()
