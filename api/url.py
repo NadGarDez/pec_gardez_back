@@ -31,7 +31,6 @@ urlpatterns = [
     path("writers/", views.WriterList.as_view(), name="writers"),
     path("writer/<int:pk>", views.WriterInstance.as_view(),name="writer"),
     path("payments/", views.PaymentList.as_view(), name="payments"),
-    path("payment/<int:pk>", views.AppointmentInstance_PutPost.as_view(),  name="payment_put_post"),
-    path("payment_put_post/<int:pk>", views.PaymentInstance_PutPost.as_view(),  name="payment"),
+    path("payment/<int:pk>", views.PaymentInstance_PutPost.as_view(),  name="payment_put_post"),
     path("payment/", views.PaymentInstance.as_view(), name='payment_post')
 ]
