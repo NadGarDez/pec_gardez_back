@@ -2,6 +2,8 @@ from django.shortcuts import render
 from .serializers import BookModelSerializer, ArticleModelSerializer, AppointmentTypeModelSerializer, RoleModelSerializer, Pay_MethodModelSerializer, User_infoModelSerializer, Social_mediaModelSerializer, Phone_numberModelSerializer, TagModelSerializer, WriterModelSerializer, SlotModelSerializer, PaymentModelSerializer,Phone_numberModelPostPutSerializer,Social_mediaModelPostPutSerializer, SlotModelPostPutSerializer, AppointmentPostPutSerializer, Pay_ReferencePostPutModelSerializer,AppointmentModelSerializer
 from rest_framework import viewsets, status, generics, mixins
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import BasicAuthentication
 from rest_framework.response import Response
 from .models import Book, Article, Appointment_type, Role, Pay_method, User_Info, Social_media, Phone_number, Tag, Slot, Writer, Payment, Appointment
 
@@ -159,6 +161,8 @@ class SlotList(generics.ListAPIView): # should filter by date, avalability , and
 class PaymentList(generics.ListAPIView): # should filter by date, owner and some filters more
     queryset = Payment.objects.all()
     serializer_class = PaymentModelSerializer
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
 class PayInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):
     queryset = Payment.objects.all()
