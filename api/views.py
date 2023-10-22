@@ -44,14 +44,20 @@ class AppointmentTypeInstance(mixins.RetrieveModelMixin, generics.GenericAPIView
 class RoleList(generics.ListAPIView):
     queryset = Role.objects.all()
     serializer_class = RoleModelSerializer
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
 class Pay_methodList(generics.ListAPIView):    
     queryset = Pay_method.objects.all()
     serializer_class = Pay_MethodModelSerializer
-
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    
 class User_InfoList(generics.ListAPIView):
     queryset = User_Info.objects.all()
     serializer_class = User_infoModelSerializer
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
 class User_InfoInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):
     queryset = User_Info.objects.all()
@@ -63,6 +69,8 @@ class User_InfoInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):
 class Social_mediaList(generics.ListAPIView): # shold list filtering by the owner 
     queryset = Social_media.objects.all()
     serializer_class = Social_mediaModelSerializer
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
 class Social_mediaInstance(mixins.CreateModelMixin, generics.GenericAPIView):
     queryset = Appointment_type.objects.all()
@@ -74,6 +82,8 @@ class Social_mediaInstance(mixins.CreateModelMixin, generics.GenericAPIView):
 class Phone_numberList(generics.ListAPIView): # should filter by the owner
     queryset = Phone_number.objects.all()
     serializer_class = Phone_numberModelSerializer
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
 class Phone_numberInstance(APIView):
     def post(self, request, format=None):
@@ -157,6 +167,8 @@ class WriterInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):
 class SlotList(generics.ListAPIView): # should filter by date, avalability , and owner
     queryset = Slot.objects.all()
     serializer_class = SlotModelSerializer
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
 class PaymentList(generics.ListAPIView): # should filter by date, owner and some filters more
     queryset = Payment.objects.all()
@@ -189,7 +201,6 @@ class PaymentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin,
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
 
-
 class AppointmentInstance(APIView):
     def post(self, request, format=None):
         serializer = AppointmentPostPutSerializer(data = request.data)
@@ -208,8 +219,8 @@ class AppointmentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMi
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
 
-
 class AppointmentList(generics.ListAPIView): # should filter by date, owner and some filters more
     queryset = Appointment.objects.all()
     serializer_class = AppointmentModelSerializer
-# in the next practice we are going to use the relationships tool in django rest framework to serialize model relationship fields.
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
