@@ -26,7 +26,6 @@ urlpatterns = [
     path("phone_numbers/", views.Phone_numberList.as_view(), name="phone_numbers"), # should filter by owner,
     path("phone/", views.Phone_numberInstance.as_view(), name="phone"),
     path("phone/<int:pk>", views.Phone_numberInstanceDeletePut.as_view(), name="phone_put_delete"),
-    path("tag/", views.TagInstance.as_view(), name="tag "), 
     path("tags/", views.TagList.as_view(), name="tags"), # it's probably this endpoint be unused
     path("writers/", views.WriterList.as_view(), name="writers"),
     path("writer/<int:pk>", views.WriterInstance.as_view(),name="writer"),

@@ -62,6 +62,8 @@ class User_InfoList(generics.ListAPIView):
 class User_InfoInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):
     queryset = User_Info.objects.all()
     serializer_class = User_infoModelSerializer
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request,*args, **kwargs):
         return self.retrieve(self, request,*args, **kwargs)
@@ -75,6 +77,8 @@ class Social_mediaList(generics.ListAPIView): # shold list filtering by the owne
 class Social_mediaInstance(mixins.CreateModelMixin, generics.GenericAPIView):
     queryset = Appointment_type.objects.all()
     serializer_class = AppointmentTypeModelSerializer
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request,*args, **kwargs):
         return self.retrieve(self, request,*args, **kwargs)
@@ -86,6 +90,9 @@ class Phone_numberList(generics.ListAPIView): # should filter by the owner
     permission_classes = [IsAuthenticated]
 
 class Phone_numberInstance(APIView):
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, format=None):
         serializer = Phone_numberModelPostPutSerializer(data=request.data)
         if serializer.is_valid():
@@ -97,6 +104,8 @@ class Phone_numberInstance(APIView):
 class Phone_numberInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):
     queryset = Phone_number.objects.all()
     serializer_class = Phone_numberModelPostPutSerializer
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
@@ -105,6 +114,9 @@ class Phone_numberInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
         return self.update(request, *args, **kwargs)
 
 class Social_mediaInstance(APIView):
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, format=None):
         serializer = Social_mediaModelPostPutSerializer(data = request.data)
         if serializer.is_valid():
@@ -115,6 +127,8 @@ class Social_mediaInstance(APIView):
 class Social_mediaInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):
     queryset = Social_media.objects.all()
     serializer_class = Social_mediaModelPostPutSerializer
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
@@ -123,6 +137,9 @@ class Social_mediaInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
         return self.update(request, *args, **kwargs)
 
 class SlotInstance(APIView):
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, format=None):
         serializer = SlotModelPostPutSerializer(data = request.data)
         if serializer.is_valid():
@@ -133,6 +150,8 @@ class SlotInstance(APIView):
 class SlotInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):
     queryset = Slot.objects.all()
     serializer_class = SlotModelPostPutSerializer
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def delete(self, request, *args, **kargs):
         return self.destroy(request, *args, **kargs)
@@ -143,15 +162,6 @@ class SlotInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin, ge
 class TagList(generics.ListAPIView):
     queryset = Tag.objects.all()
     serializer_class = TagModelSerializer
-
-class TagInstance(APIView): # this is only a practice
-
-    def post(self, request, format=None):
-        serializer = TagModelSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class WriterList(generics.ListAPIView):
     queryset = Writer.objects.all()
@@ -177,6 +187,8 @@ class PaymentList(generics.ListAPIView): # should filter by date, owner and some
     permission_classes = [IsAuthenticated]
 
 class PayInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]    
     queryset = Payment.objects.all()
     serializer_class = PaymentModelSerializer
 
@@ -184,6 +196,9 @@ class PayInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):
         return self.retrieve(self, request,*args, **kwargs)
 
 class PaymentInstance(APIView): # this should be protected
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request,format=None):
         serializer = Pay_ReferencePostPutModelSerializer(data = request.data)
         if serializer.is_valid():
@@ -194,6 +209,8 @@ class PaymentInstance(APIView): # this should be protected
 class PaymentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):
     queryset = Payment.objects.all()
     serializer_class = Pay_ReferencePostPutModelSerializer
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def delete(self, request, *args, **kargs):
         return self.destroy(request, *args, **kargs)
@@ -202,6 +219,9 @@ class PaymentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin,
         return self.update(request, *args, **kwargs)
 
 class AppointmentInstance(APIView):
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, format=None):
         serializer = AppointmentPostPutSerializer(data = request.data)
         if serializer.is_valid():
@@ -212,6 +232,9 @@ class AppointmentInstance(APIView):
 class AppointmentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):
     queryset = Appointment.objects.all()
     serializer_class = AppointmentPostPutSerializer
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
 
     def delete(self, request, *args, **kargs):
         return self.destroy(request, *args, **kargs)
@@ -224,3 +247,6 @@ class AppointmentList(generics.ListAPIView): # should filter by date, owner and 
     serializer_class = AppointmentModelSerializer
     authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated]
+
+
+# tested with basic authentication : put, get, post, delete phone number, put, get, delete, post social media 
