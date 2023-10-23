@@ -1,6 +1,10 @@
 from django.urls import path, include
 from . import views
 from rest_framework import routers
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 
 urlpatterns = [
@@ -31,5 +35,7 @@ urlpatterns = [
     path("writer/<int:pk>", views.WriterInstance.as_view(),name="writer"),
     path("payments/", views.PaymentList.as_view(), name="payments"),
     path("payment/<int:pk>", views.PaymentInstance_PutPost.as_view(),  name="payment_put_post"),
-    path("payment/", views.PaymentInstance.as_view(), name='payment_post')
+    path("payment/", views.PaymentInstance.as_view(), name='payment_post'),
+    path("token/",TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh")
 ]

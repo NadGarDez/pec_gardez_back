@@ -247,6 +247,3 @@ class AppointmentList(generics.ListAPIView): # should filter by date, owner and 
     serializer_class = AppointmentModelSerializer
     authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated]
-
-
-# tested with basic authentication : put, get, post, delete phone number, put, get, delete, post social media 
