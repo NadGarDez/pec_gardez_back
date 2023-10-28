@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Book, Article, Appointment_type, Role, Pay_method, User_Info, Social_media, Phone_number, Tag, Slot, Writer, Payment, Appointment
-
+from .utils import get_user_id_from_token
 
 class BookList(generics.ListAPIView):
     queryset = Book.objects.all()
@@ -162,9 +162,27 @@ class WriterInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):
         return self.retrieve(self, request,*args, **kwargs)
     
 class SlotList(generics.ListAPIView): # should filter by date, avalability , and owner
-    queryset = Slot.objects.all()
     serializer_class = SlotModelSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+       authorization = self.request.headers['Authorization']
+       new_string = authorization.split("Bearer ")
+       current_request_user_id = get_user_id_from_token(new_string[1])
+       user_info = User_Info.objects.get(pk = current_request_user_id)
+
+       if user_info.role.role_name == 'Admin':
+           print("admin")
+           return Slot.objects.all()
+       
+       elif user_info.role.role_name == 'Client':
+           print("client")
+           query = Slot.objects.filter(available=True)
+           return query
+       else:
+           return Slot.objects.filter(owner=user_info)
+           
+       
 
 class PaymentList(generics.ListAPIView): # should filter by date, owner and some filters more
     queryset = Payment.objects.all()
