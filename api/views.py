@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Book, Article, Appointment_type, Role, Pay_method, User_Info, Social_media, Phone_number, Tag, Slot, Writer, Payment, Appointment
-from .utils import get_user_id_from_token
+from .utils import filter_results_depending_on_role
 
 class BookList(generics.ListAPIView):
     queryset = Book.objects.all()
@@ -166,23 +166,18 @@ class SlotList(generics.ListAPIView): # should filter by date, avalability , and
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-       authorization = self.request.headers['Authorization']
-       new_string = authorization.split("Bearer ")
-       current_request_user_id = get_user_id_from_token(new_string[1])
-       user_info = User_Info.objects.get(pk = current_request_user_id)
+       
+        def admin_action(user_info):
+            return Slot.objects.all()
 
-       if user_info.role.role_name == 'Admin':
-           print("admin")
-           return Slot.objects.all()
-       
-       elif user_info.role.role_name == 'Client':
-           print("client")
-           query = Slot.objects.filter(available=True)
-           return query
-       else:
-           return Slot.objects.filter(owner=user_info)
-           
-       
+        def client_action(user_info):
+            return Slot.objects.filter(available=True)
+        
+        def psico_action(user_info):
+            return Slot.objects.filter(owner=user_info)
+
+        return filter_results_depending_on_role(self.request.headers, admin_action=admin_action, client_action=client_action, psico_action=psico_action)
+
 
 class PaymentList(generics.ListAPIView): # should filter by date, owner and some filters more
     queryset = Payment.objects.all()
