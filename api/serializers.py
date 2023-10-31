@@ -60,10 +60,11 @@ class Pay_ReferencePostPutModelSerializer(serializers.HyperlinkedModelSerializer
 class PaymentModelSerializer(serializers.HyperlinkedModelSerializer): # listo el view
     method = Pay_MethodModelSerializer()
     product = AppointmentTypeModelSerializer()
+    owner = serializers.PrimaryKeyRelatedField(queryset=User_Info.objects.all())
     
     class Meta:
         model = Payment
-        fields = ['id','method','transaction_code','product']
+        fields = ['id','method','transaction_code','product', 'owner']
 
 class UserSerializer(serializers.HyperlinkedModelSerializer): # doesn't need view
     class Meta:

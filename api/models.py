@@ -3,44 +3,11 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
 # Create your models here.
-class Writer(models.Model): # listo el serializer
-    id = models.AutoField(primary_key=True)
-    first_name = models.CharField(max_length=255, blank=True)
-    last_name = models.CharField(max_length=255, blank=True)
-    internal_writer = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
-    def __str__(self):
-       
-        if len(self.first_name)<1:
-            return self.internal_writer.get_username()
-        else:
-            return self.first_name
-
 class Tag(models.Model): #listo el serializer
     id = models.AutoField(primary_key=True)
     tag_name = models.CharField(max_length=50)
     def __str__(self):
         return self.tag_name
-
-class Article(models.Model): # listo el serializer
-    id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=50, null=False, default="The Article title")
-    tags = models.ManyToManyField(Tag)
-    writers = models.ManyToManyField(Writer)
-    principal_image = models.URLField(max_length=255)
-    content = models.TextField(default="An article")
-    def __str__(self):
-        return self.title
-
-class Book(models.Model): # listo el serializer
-    id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=50, null=False, default="The Book title")
-    tags = models.ManyToManyField(Tag)
-    writers = models.ManyToManyField(Writer)
-    principal_image = models.URLField(max_length=255)
-    resume=models.TextField(default="Default text")
-    download_url = models.URLField(max_length=255)
-    def __str__(self):
-        return self.title
 
 class Appointment_type(models.Model): # listo el serializer
     options =[
@@ -73,7 +40,7 @@ class Payment(models.Model): # listo el serializer
     transaction_code = models.CharField(max_length=255)
     product =  models.ForeignKey(Appointment_type,on_delete=models.CASCADE)
     def __str__(self):
-        return "Payment: " + id
+        return "Payment: " + str(self.id)
 
 class Role(models.Model): # listo el serializer
     id = models.AutoField(primary_key=True)
@@ -93,6 +60,51 @@ class User_Info(models.Model): # listo el serializer
     role = models.ForeignKey(Role, on_delete=models.CASCADE)
     def __str__(self):
         return self.first_name
+
+
+    
+class Writer(models.Model): # listo el serializer
+    id = models.AutoField(primary_key=True)
+    first_name = models.CharField(max_length=255, blank=True)
+    last_name = models.CharField(max_length=255, blank=True)
+    internal_writer = models.OneToOneField(User_Info, on_delete=models.CASCADE, null=True, blank=True)
+    def __str__(self):
+       
+        if len(self.first_name)<1:
+            return self.internal_writer.get_username()
+        else:
+            return self.first_name
+
+class Article(models.Model): # listo el serializer
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=50, null=False, default="The Article title")
+    tags = models.ManyToManyField(Tag)
+    writers = models.ManyToManyField(Writer)
+    principal_image = models.URLField(max_length=255)
+    content = models.TextField(default="An article")
+    def __str__(self):
+        return self.title
+
+class Book(models.Model): # listo el serializer
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=50, null=False, default="The Book title")
+    tags = models.ManyToManyField(Tag)
+    writers = models.ManyToManyField(Writer)
+    principal_image = models.URLField(max_length=255)
+    resume=models.TextField(default="Default text")
+    download_url = models.URLField(max_length=255)
+    def __str__(self):
+        return self.title
+
+    
+class Payment(models.Model): # listo el serializer
+    id = models.AutoField(primary_key=True)
+    method = models.ForeignKey(Pay_method,on_delete=models.CASCADE)
+    transaction_code = models.CharField(max_length=255)
+    product =  models.ForeignKey(Appointment_type,on_delete=models.CASCADE)
+    owner =  models.ForeignKey(User_Info, on_delete=models.CASCADE)
+    def __str__(self):
+        return "Payment: " + str(self.id)
 
 class Social_media(models.Model): # listo serializer
     id = models.AutoField(primary_key=True)

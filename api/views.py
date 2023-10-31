@@ -180,9 +180,23 @@ class SlotList(generics.ListAPIView): # should filter by date, avalability , and
 
 
 class PaymentList(generics.ListAPIView): # should filter by date, owner and some filters more
-    queryset = Payment.objects.all()
     serializer_class = PaymentModelSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+       
+        def admin_action(user_info):
+            return Payment.objects.all()
+
+        def client_action(user_info):
+            # return all the payment of the certain client
+            return Payment.objects.filter(owner=user_info.id)
+        
+        def psico_action(user_info):
+            # has not permission
+            return Payment.objects.none()
+
+        return filter_results_depending_on_role(self.request.headers, admin_action=admin_action, client_action=client_action, psico_action=psico_action)
 
 class PayInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):
     permission_classes = [IsAuthenticated]    
