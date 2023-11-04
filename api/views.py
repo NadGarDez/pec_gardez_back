@@ -40,7 +40,7 @@ class AppointmentTypeInstance(mixins.RetrieveModelMixin, generics.GenericAPIView
     def get(self, request,*args, **kwargs):
         return self.retrieve(self, request,*args, **kwargs)
     
-class RoleList(generics.ListAPIView):#restricted
+class RoleList(generics.ListAPIView):# this view may be deleted
     queryset = Role.objects.all()
     serializer_class = RoleModelSerializer
     permission_classes = [IsAuthenticated]
@@ -50,10 +50,9 @@ class Pay_methodList(generics.ListAPIView):    #public
     serializer_class = Pay_MethodModelSerializer
     
 class User_InfoList(generics.ListAPIView):# restricted
-    queryset = User_Info.objects.all()
     serializer_class = User_infoModelSerializer
     permission_classes = [IsAuthenticated]
-    # follow 
+
     def get_queryset(self):
        
         def admin_action(user_info):
@@ -77,9 +76,22 @@ class User_InfoInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):# re
         return self.retrieve(self, request,*args, **kwargs)
     
 class Social_mediaList(generics.ListAPIView): # public
-    queryset = Social_media.objects.all()
     serializer_class = Social_mediaModelSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+       
+        def admin_action(user_info):
+            return Social_media.objects.all()
+
+        def client_action(user_info):
+            return Social_media.objects.filter(owner=user_info)
+        
+        def psico_action(user_info):
+            return Social_media.objects.filter(owner=user_info)
+
+        return filter_results_depending_on_role(self.request.headers, admin_action=admin_action, client_action=client_action, psico_action=psico_action)
+
 
 class Social_mediaInstance(mixins.CreateModelMixin, generics.GenericAPIView): # restricted
     queryset = Appointment_type.objects.all()
