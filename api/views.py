@@ -53,6 +53,20 @@ class User_InfoList(generics.ListAPIView):# restricted
     queryset = User_Info.objects.all()
     serializer_class = User_infoModelSerializer
     permission_classes = [IsAuthenticated]
+    # follow 
+    def get_queryset(self):
+       
+        def admin_action(user_info):
+            return User_Info.objects.all()
+
+        def client_action(user_info):
+            return User_Info.objects.filter(role=3)
+        
+        def psico_action(user_info):
+            return User_Info.objects.exclude(role=2)
+
+        return filter_results_depending_on_role(self.request.headers, admin_action=admin_action, client_action=client_action, psico_action=psico_action)
+
 
 class User_InfoInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):# restricted
     queryset = User_Info.objects.all()
