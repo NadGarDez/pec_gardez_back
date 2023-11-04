@@ -103,9 +103,22 @@ class Social_mediaInstance(mixins.CreateModelMixin, generics.GenericAPIView): # 
         return self.retrieve(self, request,*args, **kwargs)
 
 class Phone_numberList(generics.ListAPIView): # public
-    queryset = Phone_number.objects.all()
     serializer_class = Phone_numberModelSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+       
+        def admin_action(user_info):
+            return Phone_number.objects.all()
+
+        def client_action(user_info):
+            return Phone_number.objects.filter(owner=user_info)
+        
+        def psico_action(user_info):
+            return Phone_number.objects.filter(owner=user_info)
+
+        return filter_results_depending_on_role(self.request.headers, admin_action=admin_action, client_action=client_action, psico_action=psico_action)
+
 
 class Phone_numberInstance(APIView): # restricted
     permission_classes = [IsAuthenticated]
