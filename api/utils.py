@@ -10,7 +10,7 @@ def filter_results_depending_on_role(headers, admin_action, client_action, psico
     new_string = authorization.split("Bearer ")
     current_request_user_id = get_user_id_from_token(new_string[1])
     
-    user_info = User_Info.objects.get(pk = current_request_user_id)
+    user_info = User_Info.objects.get(user = current_request_user_id)
 
     if user_info.role.role_name == 'admin':
         return admin_action(user_info)
