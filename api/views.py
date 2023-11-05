@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Book, Article, Appointment_type, Role, Pay_method, User_Info, Social_media, Phone_number, Tag, Slot, Writer, Payment, Appointment
-from .utils import filter_results_depending_on_role
+from .utils import filter_results_depending_on_role, get_user_id_from_token, get_token_from_headers, get_user_info_from_user_id
 
 class BookList(generics.ListAPIView):# PUBLIC
     queryset = Book.objects.all()
@@ -236,16 +236,10 @@ class PaymentList(generics.ListAPIView): # should filter by date, owner and some
 
         return filter_results_depending_on_role(self.request.headers, admin_action=admin_action, client_action=client_action, psico_action=psico_action)
 
-class PayInstance(mixins.RetrieveModelMixin, generics.GenericAPIView): # restricted
-    permission_classes = [IsAuthenticated]    
-    queryset = Payment.objects.all()
-    serializer_class = PaymentModelSerializer
-
-    def get(self, request,*args, **kwargs):
-        return self.retrieve(self, request,*args, **kwargs)
-
 class PaymentInstance(APIView): # this should be protected
     permission_classes = [IsAuthenticated]
+    serializer_class = PaymentModelSerializer
+
     
     def post(self, request,format=None):
         serializer = Pay_ReferencePostPutModelSerializer(data = request.data)
@@ -253,17 +247,41 @@ class PaymentInstance(APIView): # this should be protected
             serializer.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 class PaymentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView): # restricted
     queryset = Payment.objects.all()
     serializer_class = Pay_ReferencePostPutModelSerializer
     permission_classes = [IsAuthenticated]
 
-    def delete(self, request, *args, **kargs):
-        return self.destroy(request, *args, **kargs)
+
+    def delete(self, request,pk, *args, **kargs):
+        token = get_token_from_headers(request.headers)
+        user_id = get_user_id_from_token(token=token)
+        user_info = get_user_info_from_user_id(user_id)
+
+        payment = Payment.objects.get(id=pk)
+
+        if payment.owner.id == user_info.id or user_info.role.role_name == 'admin':
+            return self.destroy(request, *args, **kargs)
+        else:
+            return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
     
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+    def put(self, request, pk, *args, **kwargs):
+        # if the user is the owner of the resourse complete the transaction if not return 404 error
+            # task 1 : get the user_info information
+            # task 2 : get the resource owner
+            # task 3 : compare 
+            # task 4 : return error if the resourse not belongs to the user
+            # task 5 : return resource if the resource belongs to the user
+        token = get_token_from_headers(request.headers)
+        user_id = get_user_id_from_token(token=token)
+        user_info = get_user_info_from_user_id(user_id)
+
+        payment = Payment.objects.get(id=pk)
+
+        if payment.owner.id == user_info.id or user_info.role.role_name == 'admin':
+            return self.update(request, *args, **kwargs)
+        else:
+            return Response("You cannot modify this item", status=status.HTTP_400_BAD_REQUEST)
 
 class AppointmentInstance(APIView): # restricted
     permission_classes = [IsAuthenticated]
