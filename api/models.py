@@ -32,16 +32,7 @@ class Pay_method(models.Model): # listo el serializer
     owner_name = models.CharField(max_length=100)
     def __str__(self):
         return "Pay method: "+ self.method_name
-
-
-class Payment(models.Model): # listo el serializer
-    id = models.AutoField(primary_key=True)
-    method = models.ForeignKey(Pay_method,on_delete=models.CASCADE)
-    transaction_code = models.CharField(max_length=255)
-    product =  models.ForeignKey(Appointment_type,on_delete=models.CASCADE)
-    def __str__(self):
-        return "Payment: " + str(self.id)
-
+        
 class Role(models.Model): # listo el serializer
     id = models.AutoField(primary_key=True)
     role_name = models.CharField(max_length=50)

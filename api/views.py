@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Book, Article, Appointment_type, Role, Pay_method, User_Info, Social_media, Phone_number, Tag, Slot, Writer, Payment, Appointment
-from .utils import filter_results_depending_on_role, get_user_id_from_token, get_token_from_headers, get_user_info_from_user_id
+from .utils import filter_results_depending_on_role, get_user_id_from_token, get_token_from_headers, get_user_info_from_user_id,get_user_info_from_headers
 
 class BookList(generics.ListAPIView):# PUBLIC
     queryset = Book.objects.all()
@@ -72,7 +72,7 @@ class User_InfoInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):# re
     serializer_class = User_infoModelSerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self, request,*args, **kwargs):
+    def get(self, request,*args, **kwargs): # required permission
         return self.retrieve(self, request,*args, **kwargs)
     
 class Social_mediaList(generics.ListAPIView): # public
@@ -123,7 +123,7 @@ class Phone_numberList(generics.ListAPIView): # public
 class Phone_numberInstance(APIView): # restricted
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, format=None):
+    def post(self, request, format=None): # needed permission
         serializer = Phone_numberModelPostPutSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -136,16 +136,31 @@ class Phone_numberInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
     serializer_class = Phone_numberModelPostPutSerializer
     permission_classes = [IsAuthenticated]
 
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
+    def is_owner_or_admin(model_instance, user_info):
+        return model_instance.owner.id == user_info.id or user_info.role.role_name == 'admin'
 
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+    def delete(self, request,pk, *args, **kargs): # needed permission
+        user_info = get_user_info_from_headers(request)
+        phone_number = Phone_number.objects.get(id=pk)
+
+        if elf.is_owner_or_admin(phone_number, user_info):
+            return self.destroy(request, *args, **kargs)
+        else:
+            return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, *args, **kwargs):# needed permission
+        user_info = get_user_info_from_headers(request)
+        phone_number = Phone_number.objects.get(id=pk)
+
+        if elf.is_owner_or_admin(phone_number, user_info):
+            return self.update(request, *args, **kargs)
+        else:
+            return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
 
 class Social_mediaInstance(APIView): #restricted
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, format=None):
+    def post(self, request, format=None): # needed permission
         serializer = Social_mediaModelPostPutSerializer(data = request.data)
         if serializer.is_valid():
             serializer.save()
@@ -157,16 +172,30 @@ class Social_mediaInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
     serializer_class = Social_mediaModelPostPutSerializer
     permission_classes = [IsAuthenticated]
 
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
-    
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+    def is_owner_or_admin(model_instance, user_info):
+        return model_instance.owner.id == user_info.id or user_info.role.role_name == 'admin'
 
+    def delete(self, request,pk, *args, **kargs): # needed permission
+        user_info = get_user_info_from_headers(request)
+        social_media_instance = Social_media.objects.get(id=pk)
+
+        if elf.is_owner_or_admin(social_media_instance, user_info):
+            return self.destroy(request, *args, **kargs)
+        else:
+            return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, *args, **kwargs):# needed permission
+        user_info = get_user_info_from_headers(request)
+        social_media_instance = Social_media.objects.get(id=pk)
+
+        if elf.is_owner_or_admin(social_media_instance, user_info):
+            return self.update(request, *args, **kargs)
+        else:
+            return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
 class SlotInstance(APIView):#restricted
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, format=None):
+    def post(self, request, format=None): # needed permission
         serializer = SlotModelPostPutSerializer(data = request.data)
         if serializer.is_valid():
             serializer.save()
@@ -178,11 +207,26 @@ class SlotInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin, ge
     serializer_class = SlotModelPostPutSerializer
     permission_classes = [IsAuthenticated]
 
-    def delete(self, request, *args, **kargs):
-        return self.destroy(request, *args, **kargs)
-    
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+    def is_owner_or_admin(model_instance, user_info):
+        return model_instance.owner.id == user_info.id or user_info.role.role_name == 'admin'
+
+    def delete(self, request,pk, *args, **kargs): # needed permission
+        user_info = get_user_info_from_headers(request)
+        slot = Slot.objects.get(id=pk)
+
+        if elf.is_owner_or_admin(slot, user_info):
+            return self.destroy(request, *args, **kargs)
+        else:
+            return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, *args, **kwargs):# needed permission
+        user_info = get_user_info_from_headers(request)
+        slot = Social_media.objects.get(id=pk)
+
+        if elf.is_owner_or_admin(slot, user_info):
+            return self.update(request, *args, **kargs)
+        else:
+            return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
 
 class TagList(generics.ListAPIView):# public
     queryset = Tag.objects.all()
@@ -241,7 +285,7 @@ class PaymentInstance(APIView): # this should be protected
     serializer_class = PaymentModelSerializer
 
     
-    def post(self, request,format=None):
+    def post(self, request,format=None): # needed permission
         serializer = Pay_ReferencePostPutModelSerializer(data = request.data)
         if serializer.is_valid():
             serializer.save()
@@ -252,40 +296,30 @@ class PaymentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin,
     serializer_class = Pay_ReferencePostPutModelSerializer
     permission_classes = [IsAuthenticated]
 
+    def is_owner_or_admin(model_instance, user_info):
+        return model_instance.owner.id == user_info.id or user_info.role.role_name == 'admin'
 
     def delete(self, request,pk, *args, **kargs):
-        token = get_token_from_headers(request.headers)
-        user_id = get_user_id_from_token(token=token)
-        user_info = get_user_info_from_user_id(user_id)
-
+        user_info = get_user_info_from_headers(request)
         payment = Payment.objects.get(id=pk)
 
-        if payment.owner.id == user_info.id or user_info.role.role_name == 'admin':
+        if elf.is_owner_or_admin(payment, user_info):
             return self.destroy(request, *args, **kargs)
         else:
             return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
     
     def put(self, request, pk, *args, **kwargs):
-        # if the user is the owner of the resourse complete the transaction if not return 404 error
-            # task 1 : get the user_info information
-            # task 2 : get the resource owner
-            # task 3 : compare 
-            # task 4 : return error if the resourse not belongs to the user
-            # task 5 : return resource if the resource belongs to the user
-        token = get_token_from_headers(request.headers)
-        user_id = get_user_id_from_token(token=token)
-        user_info = get_user_info_from_user_id(user_id)
-
+        user_info =  user_info = get_user_info_from_headers(request)
         payment = Payment.objects.get(id=pk)
 
-        if payment.owner.id == user_info.id or user_info.role.role_name == 'admin':
+        if self.is_owner_or_admin(payment, user_info):
             return self.update(request, *args, **kwargs)
         else:
             return Response("You cannot modify this item", status=status.HTTP_400_BAD_REQUEST)
 
 class AppointmentInstance(APIView): # restricted
     permission_classes = [IsAuthenticated]
-    def post(self, request, format=None):
+    def post(self, request, format=None): # needed permission
         serializer = AppointmentPostPutSerializer(data = request.data)
         if serializer.is_valid():
             serializer.save()
@@ -297,12 +331,26 @@ class AppointmentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMi
     serializer_class = AppointmentPostPutSerializer
     permission_classes = [IsAuthenticated]
 
-    def delete(self, request, *args, **kargs):
-        return self.destroy(request, *args, **kargs)
-    
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+    def is_owner_or_admin(model_instance, user_info):
+        return model_instance.client.id == user_info.id or user_info.role.role_name == 'admin'
 
+    def delete(self, request,pk, *args, **kargs): # needed permission
+        user_info = get_user_info_from_headers(request)
+        appointment = Appointment.objects.get(id=pk)
+
+        if elf.is_owner_or_admin(appointment, user_info):
+            return self.destroy(request, *args, **kargs)
+        else:
+            return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, *args, **kwargs):# needed permission
+        user_info = get_user_info_from_headers(request)
+        appointment = Appointment.objects.get(id=pk)
+
+        if elf.is_owner_or_admin(appointment, user_info):
+            return self.update(request, *args, **kargs)
+        else:
+            return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
 class AppointmentList(generics.ListAPIView): # should filter by date, owner and some filters more
     serializer_class = AppointmentModelSerializer
     permission_classes = [IsAuthenticated]

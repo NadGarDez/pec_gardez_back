@@ -13,6 +13,12 @@ def get_token_from_headers(headers):
 def get_user_info_from_user_id(id):
     return User_Info.objects.get(user = id)
 
+def get_user_info_from_headers(headers):
+    token = get_token_from_headers(headers)
+    user_id = get_user_id_from_token(token=token)
+    user_info = get_user_info_from_user_id(user_id)
+    return user_info
+
 def filter_results_depending_on_role(headers, admin_action, client_action, psico_action):
     authorization = headers['Authorization']
     new_string = authorization.split("Bearer ")
