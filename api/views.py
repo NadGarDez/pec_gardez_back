@@ -72,7 +72,7 @@ class User_InfoInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):# re
     serializer_class = User_infoModelSerializer
     permission_classes = [IsAuthenticated]
 
-    def is_owner_or_admin(model_instance, user_info):
+    def is_owner_or_admin(self, model_instance, user_info):
         return model_instance.id == user_info.id or user_info.role.role_name == 'admin'
 
     def get(self, request, pk, *args, **kwargs): # required permission
@@ -143,7 +143,7 @@ class Phone_numberInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
     serializer_class = Phone_numberModelPostPutSerializer
     permission_classes = [IsAuthenticated]
 
-    def is_owner_or_admin(model_instance, user_info):
+    def is_owner_or_admin(self, model_instance, user_info):
         return model_instance.owner.id == user_info.id or user_info.role.role_name == 'admin'
 
     def delete(self, request,pk, *args, **kargs): # needed permission
@@ -186,7 +186,7 @@ class Social_mediaInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
     serializer_class = Social_mediaModelPostPutSerializer
     permission_classes = [IsAuthenticated]
 
-    def is_owner_or_admin(model_instance, user_info):
+    def is_owner_or_admin(self, model_instance, user_info):
         return model_instance.owner.id == user_info.id or user_info.role.role_name == 'admin'
 
     def delete(self, request,pk, *args, **kargs): # needed permission
@@ -221,24 +221,24 @@ class SlotInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin, ge
     serializer_class = SlotModelPostPutSerializer
     permission_classes = [IsAuthenticated]
 
-    def is_owner_or_admin(model_instance, user_info):
+    def is_owner_or_admin(self, model_instance, user_info):
         return model_instance.owner.id == user_info.id or user_info.role.role_name == 'admin'
 
-    def delete(self, request,pk, *args, **kargs): # needed permission
+    def delete(self, request,pk, *args, **kwargs): # needed permission
         user_info = get_user_info_from_headers(request.headers)
         slot = Slot.objects.get(id=pk)
 
         if self.is_owner_or_admin(slot, user_info):
-            return self.destroy(request, *args, **kargs)
+            return self.destroy(request, *args, **kwargs)
         else:
             return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, *args, **kwargs):# needed permission
+    def put(self, request, pk, *args, **kwargs):# needed permission
         user_info = get_user_info_from_headers(request.headers)
-        slot = Social_media.objects.get(id=pk)
+        slot = Slot.objects.get(id=pk)
 
         if self.is_owner_or_admin(slot, user_info):
-            return self.update(request, *args, **kargs)
+            return self.update(request, *args, **kwargs)
         else:
             return Response("You cannot update this item", status=status.HTTP_400_BAD_REQUEST)
 
@@ -310,7 +310,7 @@ class PaymentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin,
     serializer_class = Pay_ReferencePostPutModelSerializer
     permission_classes = [IsAuthenticated]
 
-    def is_owner_or_admin(model_instance, user_info):
+    def is_owner_or_admin(self, model_instance, user_info):
         return model_instance.owner.id == user_info.id or user_info.role.role_name == 'admin'
 
     def delete(self, request,pk, *args, **kargs):
@@ -345,7 +345,7 @@ class AppointmentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMi
     serializer_class = AppointmentPostPutSerializer
     permission_classes = [IsAuthenticated]
 
-    def is_owner_or_admin(model_instance, user_info):
+    def is_owner_or_admin(self, model_instance, user_info):
         return model_instance.client.id == user_info.id or user_info.role.role_name == 'admin'
 
     def delete(self, request,pk, *args, **kargs): # needed permission
