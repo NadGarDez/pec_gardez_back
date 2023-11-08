@@ -189,21 +189,21 @@ class Social_mediaInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
     def is_owner_or_admin(self, model_instance, user_info):
         return model_instance.owner.id == user_info.id or user_info.role.role_name == 'admin'
 
-    def delete(self, request,pk, *args, **kargs): # needed permission
+    def delete(self, request,pk, *args, **kwargs): # needed permission
         user_info = get_user_info_from_headers(request.headers)
         social_media_instance = Social_media.objects.get(id=pk)
 
         if self.is_owner_or_admin(social_media_instance, user_info):
-            return self.destroy(request, *args, **kargs)
+            return self.destroy(request, *args, **kwargs)
         else:
             return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, *args, **kwargs):# needed permission
+    def put(self, request,pk, *args, **kwargs):# needed permission
         user_info = get_user_info_from_headers(request.headers)
         social_media_instance = Social_media.objects.get(id=pk)
 
         if self.is_owner_or_admin(social_media_instance, user_info):
-            return self.update(request, *args, **kargs)
+            return self.update(request, *args, **kwargs)
         else:
             return Response("You cannot update this item", status=status.HTTP_400_BAD_REQUEST)
 class SlotInstance(APIView):#restricted
