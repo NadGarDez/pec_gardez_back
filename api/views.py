@@ -76,7 +76,7 @@ class User_InfoInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):# re
         return model_instance.id == user_info.id or user_info.role.role_name == 'admin'
 
     def get(self, request, pk, *args, **kwargs): # required permission
-        user_info = get_user_info_from_headers(request)
+        user_info = get_user_info_from_headers(request.headers)
         model_instance = User_Info.objects.get(id=pk)
 
         if self.is_owner_or_admin(model_instance, user_info):
@@ -101,16 +101,6 @@ class Social_mediaList(generics.ListAPIView): # public
             return Social_media.objects.filter(owner=user_info)
 
         return filter_results_depending_on_role(self.request.headers, admin_action=admin_action, client_action=client_action, psico_action=psico_action)
-
-
-class Social_mediaInstance(mixins.CreateModelMixin, generics.GenericAPIView): # restricted
-    queryset = Appointment_type.objects.all()
-    serializer_class = AppointmentTypeModelSerializer
-    
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request,*args, **kwargs):
-        return self.retrieve(self, request,*args, **kwargs)
 
 class Phone_numberList(generics.ListAPIView): # public
     serializer_class = Phone_numberModelSerializer
@@ -150,7 +140,7 @@ class Phone_numberInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
         return model_instance.owner.id == user_info.id or user_info.role.role_name == 'admin'
 
     def delete(self, request,pk, *args, **kargs): # needed permission
-        user_info = get_user_info_from_headers(request)
+        user_info = get_user_info_from_headers(request.headers)
         phone_number = Phone_number.objects.get(id=pk)
 
         if self.is_owner_or_admin(phone_number, user_info):
@@ -159,7 +149,7 @@ class Phone_numberInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
             return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, *args, **kwargs):# needed permission
-        user_info = get_user_info_from_headers(request)
+        user_info = get_user_info_from_headers(request.headers)
         phone_number = Phone_number.objects.get(id=pk)
 
         if self.is_owner_or_admin(phone_number, user_info):
@@ -170,12 +160,19 @@ class Phone_numberInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
 class Social_mediaInstance(APIView): #restricted
     permission_classes = [IsAuthenticated]
 
+    def is_owner_or_admin(self, instance_owner, user_info):
+        return instance_owner == user_info.id or user_info.role.role_name == 'admin'
+
     def post(self, request, format=None): # needed permission
+        intance_owner = request.data['owner']
+        user_info = get_user_info_from_headers(request.headers)
+        result = self.is_owner_or_admin(intance_owner, user_info)
         serializer = Social_mediaModelPostPutSerializer(data = request.data)
-        if serializer.is_valid():
+        if serializer.is_valid() and self.is_owner_or_admin(intance_owner, user_info):
             serializer.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:    
+            return Response("You don't have permission to create this item", status=status.HTTP_400_BAD_REQUEST)
 
 class Social_mediaInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):# restricted
     queryset = Social_media.objects.all()
@@ -186,7 +183,7 @@ class Social_mediaInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
         return model_instance.owner.id == user_info.id or user_info.role.role_name == 'admin'
 
     def delete(self, request,pk, *args, **kargs): # needed permission
-        user_info = get_user_info_from_headers(request)
+        user_info = get_user_info_from_headers(request.headers)
         social_media_instance = Social_media.objects.get(id=pk)
 
         if self.is_owner_or_admin(social_media_instance, user_info):
@@ -195,7 +192,7 @@ class Social_mediaInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
             return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, *args, **kwargs):# needed permission
-        user_info = get_user_info_from_headers(request)
+        user_info = get_user_info_from_headers(request.headers)
         social_media_instance = Social_media.objects.get(id=pk)
 
         if self.is_owner_or_admin(social_media_instance, user_info):
@@ -221,7 +218,7 @@ class SlotInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin, ge
         return model_instance.owner.id == user_info.id or user_info.role.role_name == 'admin'
 
     def delete(self, request,pk, *args, **kargs): # needed permission
-        user_info = get_user_info_from_headers(request)
+        user_info = get_user_info_from_headers(request.headers)
         slot = Slot.objects.get(id=pk)
 
         if self.is_owner_or_admin(slot, user_info):
@@ -230,7 +227,7 @@ class SlotInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin, ge
             return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, *args, **kwargs):# needed permission
-        user_info = get_user_info_from_headers(request)
+        user_info = get_user_info_from_headers(request.headers)
         slot = Social_media.objects.get(id=pk)
 
         if self.is_owner_or_admin(slot, user_info):
@@ -310,7 +307,7 @@ class PaymentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin,
         return model_instance.owner.id == user_info.id or user_info.role.role_name == 'admin'
 
     def delete(self, request,pk, *args, **kargs):
-        user_info = get_user_info_from_headers(request)
+        user_info = get_user_info_from_headers(request.headers)
         payment = Payment.objects.get(id=pk)
 
         if self.is_owner_or_admin(payment, user_info):
@@ -319,7 +316,7 @@ class PaymentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin,
             return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
     
     def put(self, request, pk, *args, **kwargs):
-        user_info =  user_info = get_user_info_from_headers(request)
+        user_info =  user_info = get_user_info_from_headers(request.headers)
         payment = Payment.objects.get(id=pk)
 
         if self.is_owner_or_admin(payment, user_info):
@@ -345,7 +342,7 @@ class AppointmentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMi
         return model_instance.client.id == user_info.id or user_info.role.role_name == 'admin'
 
     def delete(self, request,pk, *args, **kargs): # needed permission
-        user_info = get_user_info_from_headers(request)
+        user_info = get_user_info_from_headers(request.headers)
         appointment = Appointment.objects.get(id=pk)
 
         if self.is_owner_or_admin(appointment, user_info):
@@ -354,7 +351,7 @@ class AppointmentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMi
             return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, *args, **kwargs):# needed permission
-        user_info = get_user_info_from_headers(request)
+        user_info = get_user_info_from_headers(request.headers)
         appointment = Appointment.objects.get(id=pk)
 
         if self.is_owner_or_admin(appointment, user_info):
