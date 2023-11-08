@@ -146,21 +146,21 @@ class Phone_numberInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
     def is_owner_or_admin(self, model_instance, user_info):
         return model_instance.owner.id == user_info.id or user_info.role.role_name == 'admin'
 
-    def delete(self, request,pk, *args, **kargs): # needed permission
+    def delete(self, request,pk, *args, **kwargs): # needed permission
         user_info = get_user_info_from_headers(request.headers)
         phone_number = Phone_number.objects.get(id=pk)
 
         if self.is_owner_or_admin(phone_number, user_info):
-            return self.destroy(request, *args, **kargs)
+            return self.destroy(request, *args, **kwargs)
         else:
             return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, *args, **kwargs):# needed permission
+    def put(self, request,pk, *args, **kwargs):# needed permission
         user_info = get_user_info_from_headers(request.headers)
         phone_number = Phone_number.objects.get(id=pk)
 
         if self.is_owner_or_admin(phone_number, user_info):
-            return self.update(request, *args, **kargs)
+            return self.update(request, *args, **kwargs)
         else:
             return Response("You cannot update this item", status=status.HTTP_400_BAD_REQUEST)
 
@@ -313,12 +313,12 @@ class PaymentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin,
     def is_owner_or_admin(self, model_instance, user_info):
         return model_instance.owner.id == user_info.id or user_info.role.role_name == 'admin'
 
-    def delete(self, request,pk, *args, **kargs):
+    def delete(self, request,pk, *args, **kwargs):
         user_info = get_user_info_from_headers(request.headers)
         payment = Payment.objects.get(id=pk)
 
         if self.is_owner_or_admin(payment, user_info):
-            return self.destroy(request, *args, **kargs)
+            return self.destroy(request, *args, **kwargs)
         else:
             return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
     
@@ -348,21 +348,21 @@ class AppointmentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMi
     def is_owner_or_admin(self, model_instance, user_info):
         return model_instance.client.id == user_info.id or user_info.role.role_name == 'admin'
 
-    def delete(self, request,pk, *args, **kargs): # needed permission
+    def delete(self, request,pk, *args, **kwargs): # needed permission
         user_info = get_user_info_from_headers(request.headers)
         appointment = Appointment.objects.get(id=pk)
 
         if self.is_owner_or_admin(appointment, user_info):
-            return self.destroy(request, *args, **kargs)
+            return self.destroy(request, *args, **kwargs)
         else:
             return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, *args, **kwargs):# needed permission
+    def put(self, request,pk, *args, **kwargs):# needed permission
         user_info = get_user_info_from_headers(request.headers)
         appointment = Appointment.objects.get(id=pk)
 
         if self.is_owner_or_admin(appointment, user_info):
-            return self.update(request, *args, **kargs)
+            return self.update(request, *args, **kwargs)
         else:
             return Response("You cannot update this item", status=status.HTTP_400_BAD_REQUEST)
 class AppointmentList(generics.ListAPIView): # should filter by date, owner and some filters more
