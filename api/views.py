@@ -72,7 +72,17 @@ class User_InfoInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):# re
     serializer_class = User_infoModelSerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self, request,*args, **kwargs): # required permission
+    def is_owner_or_admin(model_instance, user_info):
+        return model_instance.id == user_info.id or user_info.role.role_name == 'admin'
+
+    def get(self, request, pk, *args, **kwargs): # required permission
+        user_info = get_user_info_from_headers(request)
+        model_instance = User_Info.objects.get(id=pk)
+
+        if self.is_owner_or_admin(model_instance, user_info):
+            return self.destroy(request, *args, **kargs)
+        else:
+            return Response("You cannot read this item", status=status.HTTP_400_BAD_REQUEST)
         return self.retrieve(self, request,*args, **kwargs)
     
 class Social_mediaList(generics.ListAPIView): # public
@@ -143,7 +153,7 @@ class Phone_numberInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
         user_info = get_user_info_from_headers(request)
         phone_number = Phone_number.objects.get(id=pk)
 
-        if elf.is_owner_or_admin(phone_number, user_info):
+        if self.is_owner_or_admin(phone_number, user_info):
             return self.destroy(request, *args, **kargs)
         else:
             return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
@@ -152,10 +162,10 @@ class Phone_numberInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
         user_info = get_user_info_from_headers(request)
         phone_number = Phone_number.objects.get(id=pk)
 
-        if elf.is_owner_or_admin(phone_number, user_info):
+        if self.is_owner_or_admin(phone_number, user_info):
             return self.update(request, *args, **kargs)
         else:
-            return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
+            return Response("You cannot update this item", status=status.HTTP_400_BAD_REQUEST)
 
 class Social_mediaInstance(APIView): #restricted
     permission_classes = [IsAuthenticated]
@@ -179,7 +189,7 @@ class Social_mediaInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
         user_info = get_user_info_from_headers(request)
         social_media_instance = Social_media.objects.get(id=pk)
 
-        if elf.is_owner_or_admin(social_media_instance, user_info):
+        if self.is_owner_or_admin(social_media_instance, user_info):
             return self.destroy(request, *args, **kargs)
         else:
             return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
@@ -188,10 +198,10 @@ class Social_mediaInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
         user_info = get_user_info_from_headers(request)
         social_media_instance = Social_media.objects.get(id=pk)
 
-        if elf.is_owner_or_admin(social_media_instance, user_info):
+        if self.is_owner_or_admin(social_media_instance, user_info):
             return self.update(request, *args, **kargs)
         else:
-            return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
+            return Response("You cannot update this item", status=status.HTTP_400_BAD_REQUEST)
 class SlotInstance(APIView):#restricted
     permission_classes = [IsAuthenticated]
 
@@ -214,7 +224,7 @@ class SlotInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin, ge
         user_info = get_user_info_from_headers(request)
         slot = Slot.objects.get(id=pk)
 
-        if elf.is_owner_or_admin(slot, user_info):
+        if self.is_owner_or_admin(slot, user_info):
             return self.destroy(request, *args, **kargs)
         else:
             return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
@@ -223,10 +233,10 @@ class SlotInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin, ge
         user_info = get_user_info_from_headers(request)
         slot = Social_media.objects.get(id=pk)
 
-        if elf.is_owner_or_admin(slot, user_info):
+        if self.is_owner_or_admin(slot, user_info):
             return self.update(request, *args, **kargs)
         else:
-            return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
+            return Response("You cannot update this item", status=status.HTTP_400_BAD_REQUEST)
 
 class TagList(generics.ListAPIView):# public
     queryset = Tag.objects.all()
@@ -303,7 +313,7 @@ class PaymentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin,
         user_info = get_user_info_from_headers(request)
         payment = Payment.objects.get(id=pk)
 
-        if elf.is_owner_or_admin(payment, user_info):
+        if self.is_owner_or_admin(payment, user_info):
             return self.destroy(request, *args, **kargs)
         else:
             return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
@@ -338,7 +348,7 @@ class AppointmentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMi
         user_info = get_user_info_from_headers(request)
         appointment = Appointment.objects.get(id=pk)
 
-        if elf.is_owner_or_admin(appointment, user_info):
+        if self.is_owner_or_admin(appointment, user_info):
             return self.destroy(request, *args, **kargs)
         else:
             return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
@@ -347,10 +357,10 @@ class AppointmentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMi
         user_info = get_user_info_from_headers(request)
         appointment = Appointment.objects.get(id=pk)
 
-        if elf.is_owner_or_admin(appointment, user_info):
+        if self.is_owner_or_admin(appointment, user_info):
             return self.update(request, *args, **kargs)
         else:
-            return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
+            return Response("You cannot update this item", status=status.HTTP_400_BAD_REQUEST)
 class AppointmentList(generics.ListAPIView): # should filter by date, owner and some filters more
     serializer_class = AppointmentModelSerializer
     permission_classes = [IsAuthenticated]
