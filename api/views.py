@@ -327,7 +327,7 @@ class PaymentInstance(APIView): # this should be protected
             intance_owner = request.data['owner']
             serializer = Pay_ReferencePostPutModelSerializer(data = request.data)
 
-            if serializer.is_valid() or self.is_owner_or_admin(intance_owner,user_info):
+            if serializer.is_valid() and self.is_owner_or_admin(intance_owner,user_info):
                 serializer.save()
                 return Response(serializer.data, status = status.HTTP_201_CREATED)
             else:
@@ -369,15 +369,16 @@ class AppointmentInstance(APIView): # restricted
         return user_info.role.role_name != 'psico'
     
     def is_owner_or_admin(self, instance_owner, user_info):
+        print(instance_owner, user_info.id)
         return instance_owner == str(user_info.id) or user_info.role.role_name == 'admin'
     
     def post(self, request, format=None): # needed permission
         user_info = get_user_info_from_headers(request.headers)
 
         if self.not_psico(user_info):
-            intance_owner = request.data['owner']
+            intance_owner = request.data['client']
             serializer = AppointmentPostPutSerializer(data = request.data)
-            if serializer.is_valid() or self.is_owner_or_admin(intance_owner,user_info):
+            if serializer.is_valid() and self.is_owner_or_admin(intance_owner,user_info):
                 serializer.save()
                 return Response(serializer.data, status = status.HTTP_201_CREATED)
             else:
