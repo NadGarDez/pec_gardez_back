@@ -7,47 +7,67 @@ from rest_framework.response import Response
 from .models import Book, Article, Appointment_type, Role, Pay_method, User_Info, Social_media, Phone_number, Tag, Slot, Writer, Payment, Appointment
 from .utils import filter_results_depending_on_role, get_user_id_from_token, get_token_from_headers, get_user_info_from_user_id,get_user_info_from_headers
 
-class BookList(generics.ListAPIView):# PUBLIC
+
+# Public views
+class BookList(generics.ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookModelSerializer
 
-class BookInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):#public
+class BookInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):
     queryset = Book.objects.all()
     serializer_class = BookModelSerializer
 
     def get(self, request,*args, **kwargs):
         return self.retrieve(self, request,*args, **kwargs)
 
-class ArticleList(generics.ListAPIView):# public
+class ArticleList(generics.ListAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleModelSerializer
 
-class ArticleInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):#public
+class ArticleInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleModelSerializer
    
     def get(self, request,*args, **kwargs):
         return self.retrieve(self, request,*args, **kwargs)
 
-class AppointmentTypeList(generics.ListAPIView):#public
+class AppointmentTypeList(generics.ListAPIView):
     queryset = Appointment_type.objects.all()
     serializer_class = AppointmentTypeModelSerializer
 
-class AppointmentTypeInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):#public
+class AppointmentTypeInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):
     queryset = Appointment_type.objects.all()
     serializer_class = AppointmentTypeModelSerializer
 
     def get(self, request,*args, **kwargs):
         return self.retrieve(self, request,*args, **kwargs)
+
+class Pay_methodList(generics.ListAPIView):    
+    queryset = Pay_method.objects.all()
+    serializer_class = Pay_MethodModelSerializer
+
+class TagList(generics.ListAPIView):
+    queryset = Tag.objects.all()
+    serializer_class = TagModelSerializer
+
+class WriterList(generics.ListAPIView):
+    queryset = Writer.objects.all()
+    serializer_class = WriterModelSerializer
+
+class WriterInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):
+    queryset = Writer.objects.all()
+    serializer_class = WriterModelSerializer
+
+    def get(self, request,*args, **kwargs):
+        return self.retrieve(self, request,*args, **kwargs)
     
-class RoleList(generics.ListAPIView):# this view may be deleted
+
+# restricted views: Is needed log in and to have certain role
+class RoleList(generics.ListAPIView):
     queryset = Role.objects.all()
     serializer_class = RoleModelSerializer
     permission_classes = [IsAuthenticated]
 
-class Pay_methodList(generics.ListAPIView):    #public
-    queryset = Pay_method.objects.all()
-    serializer_class = Pay_MethodModelSerializer
     
 class User_InfoList(generics.ListAPIView):
     serializer_class = User_infoModelSerializer
@@ -256,21 +276,6 @@ class SlotInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin, ge
         else:
             return Response("You cannot update this item", status=status.HTTP_400_BAD_REQUEST)
 
-class TagList(generics.ListAPIView):# public
-    queryset = Tag.objects.all()
-    serializer_class = TagModelSerializer
-
-class WriterList(generics.ListAPIView):# public
-    queryset = Writer.objects.all()
-    serializer_class = WriterModelSerializer
-
-class WriterInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):# public
-    queryset = Writer.objects.all()
-    serializer_class = WriterModelSerializer
-
-    def get(self, request,*args, **kwargs):
-        return self.retrieve(self, request,*args, **kwargs)
-    
 class SlotList(generics.ListAPIView):
     serializer_class = SlotModelSerializer
     permission_classes = [IsAuthenticated]
@@ -314,18 +319,23 @@ class PaymentInstance(APIView): # this should be protected
         return user_info.role.role_name != 'psico'
     
     def is_owner_or_admin(self, instance_owner, user_info):
-        return instance_owner == user_info.id or user_info.role.role_name == 'admin'
+        return instance_owner == str(user_info.id) or user_info.role.role_name == 'admin'
     
     def post(self, request,format=None): # needed permission
-        intance_owner = request.data['owner']
         user_info = get_user_info_from_headers(request.headers)
-        serializer = Pay_ReferencePostPutModelSerializer(data = request.data)
         if self.not_psico(user_info):
+            intance_owner = request.data['owner']
+            serializer = Pay_ReferencePostPutModelSerializer(data = request.data)
+
             if serializer.is_valid() or self.is_owner_or_admin(intance_owner,user_info):
                 serializer.save()
                 return Response(serializer.data, status = status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                if serializer.errors:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return Response("You cannot create this item", status=status.HTTP_400_BAD_REQUEST)
+        return Response("You cannot create this item", status=status.HTTP_400_BAD_REQUEST)
 class PaymentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView): # restricted
     queryset = Payment.objects.all()
     serializer_class = Pay_ReferencePostPutModelSerializer
@@ -359,19 +369,22 @@ class AppointmentInstance(APIView): # restricted
         return user_info.role.role_name != 'psico'
     
     def is_owner_or_admin(self, instance_owner, user_info):
-        return instance_owner == user_info.id or user_info.role.role_name == 'admin'
+        return instance_owner == str(user_info.id) or user_info.role.role_name == 'admin'
     
     def post(self, request, format=None): # needed permission
-        serializer = AppointmentPostPutSerializer(data = request.data)
-        intance_owner = request.data['owner']
         user_info = get_user_info_from_headers(request.headers)
 
         if self.not_psico(user_info):
+            intance_owner = request.data['owner']
+            serializer = AppointmentPostPutSerializer(data = request.data)
             if serializer.is_valid() or self.is_owner_or_admin(intance_owner,user_info):
                 serializer.save()
                 return Response(serializer.data, status = status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                if serializer.errors:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response("You cannot create this item", status=status.HTTP_400_BAD_REQUEST)
+        return Response("You cannot create this item", status=status.HTTP_400_BAD_REQUEST)
 
 class AppointmentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView): # restricted
     queryset = Appointment.objects.all()
