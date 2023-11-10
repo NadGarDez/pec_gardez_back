@@ -154,7 +154,9 @@ class Phone_numberInstance(APIView):
         if serializer.is_valid() and self.is_owner_or_admin(intance_owner, user_info):
             serializer.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
-        else:    
+        else: 
+            if serializer.errors:
+                   return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response("You don't have permission to create this item", status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -188,7 +190,7 @@ class Social_mediaInstance(APIView):
     permission_classes = [IsAuthenticated]
 
     def is_owner_or_admin(self, instance_owner, user_info):
-        return instance_owner == user_info.id or user_info.role.role_name == 'admin'
+        return instance_owner == str(user_info.id) or user_info.role.role_name == 'admin'
 
     def post(self, request, format=None):
         intance_owner = request.data['owner']
@@ -199,6 +201,8 @@ class Social_mediaInstance(APIView):
             serializer.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         else:    
+            if serializer.errors:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response("You don't have permission to create this item", status=status.HTTP_400_BAD_REQUEST)
 
 class Social_mediaInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):
