@@ -49,7 +49,7 @@ class Pay_methodList(generics.ListAPIView):    #public
     queryset = Pay_method.objects.all()
     serializer_class = Pay_MethodModelSerializer
     
-class User_InfoList(generics.ListAPIView):# restricted
+class User_InfoList(generics.ListAPIView):
     serializer_class = User_infoModelSerializer
     permission_classes = [IsAuthenticated]
 
@@ -67,7 +67,7 @@ class User_InfoList(generics.ListAPIView):# restricted
         return filter_results_depending_on_role(self.request.headers, admin_action=admin_action, client_action=client_action, psico_action=psico_action)
 
 
-class User_InfoInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):# restricted
+class User_InfoInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):
     queryset = User_Info.objects.all()
     serializer_class = User_infoModelSerializer
     permission_classes = [IsAuthenticated]
@@ -75,7 +75,7 @@ class User_InfoInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):# re
     def is_owner_or_admin(self, model_instance, user_info):
         return model_instance.id == user_info.id or user_info.role.role_name == 'admin'
 
-    def get(self, request, pk, *args, **kwargs): # required permission
+    def get(self, request, pk, *args, **kwargs):
         user_info = get_user_info_from_headers(request.headers)
         model_instance = User_Info.objects.get(id=pk)
 
@@ -85,7 +85,7 @@ class User_InfoInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):# re
             return Response("You cannot read this item", status=status.HTTP_400_BAD_REQUEST)
         return self.retrieve(self, request,*args, **kwargs)
     
-class Social_mediaList(generics.ListAPIView): # public
+class Social_mediaList(generics.ListAPIView):
     serializer_class = Social_mediaModelSerializer
     permission_classes = [IsAuthenticated]
 
@@ -102,7 +102,7 @@ class Social_mediaList(generics.ListAPIView): # public
 
         return filter_results_depending_on_role(self.request.headers, admin_action=admin_action, client_action=client_action, psico_action=psico_action)
 
-class Phone_numberList(generics.ListAPIView): # public
+class Phone_numberList(generics.ListAPIView):
     serializer_class = Phone_numberModelSerializer
     permission_classes = [IsAuthenticated]
 
@@ -120,13 +120,13 @@ class Phone_numberList(generics.ListAPIView): # public
         return filter_results_depending_on_role(self.request.headers, admin_action=admin_action, client_action=client_action, psico_action=psico_action)
 
 
-class Phone_numberInstance(APIView): # restricted
+class Phone_numberInstance(APIView): 
     permission_classes = [IsAuthenticated]
     
     def is_owner_or_admin(self, instance_owner, user_info):
         return instance_owner == user_info.id or user_info.role.role_name == 'admin'
 
-    def post(self, request, format=None): # needed permission
+    def post(self, request, format=None):
         intance_owner = request.data['owner']
         user_info = get_user_info_from_headers(request.headers)
         result = self.is_owner_or_admin(intance_owner, user_info)
@@ -146,7 +146,7 @@ class Phone_numberInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
     def is_owner_or_admin(self, model_instance, user_info):
         return model_instance.owner.id == user_info.id or user_info.role.role_name == 'admin'
 
-    def delete(self, request,pk, *args, **kwargs): # needed permission
+    def delete(self, request,pk, *args, **kwargs):
         user_info = get_user_info_from_headers(request.headers)
         phone_number = Phone_number.objects.get(id=pk)
 
@@ -155,7 +155,7 @@ class Phone_numberInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
         else:
             return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request,pk, *args, **kwargs):# needed permission
+    def put(self, request,pk, *args, **kwargs):
         user_info = get_user_info_from_headers(request.headers)
         phone_number = Phone_number.objects.get(id=pk)
 
@@ -164,13 +164,13 @@ class Phone_numberInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
         else:
             return Response("You cannot update this item", status=status.HTTP_400_BAD_REQUEST)
 
-class Social_mediaInstance(APIView): #restricted
+class Social_mediaInstance(APIView):
     permission_classes = [IsAuthenticated]
 
     def is_owner_or_admin(self, instance_owner, user_info):
         return instance_owner == user_info.id or user_info.role.role_name == 'admin'
 
-    def post(self, request, format=None): # needed permission
+    def post(self, request, format=None):
         intance_owner = request.data['owner']
         user_info = get_user_info_from_headers(request.headers)
         result = self.is_owner_or_admin(intance_owner, user_info)
@@ -181,7 +181,7 @@ class Social_mediaInstance(APIView): #restricted
         else:    
             return Response("You don't have permission to create this item", status=status.HTTP_400_BAD_REQUEST)
 
-class Social_mediaInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):# restricted
+class Social_mediaInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):
     queryset = Social_media.objects.all()
     serializer_class = Social_mediaModelPostPutSerializer
     permission_classes = [IsAuthenticated]
@@ -189,7 +189,7 @@ class Social_mediaInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
     def is_owner_or_admin(self, model_instance, user_info):
         return model_instance.owner.id == user_info.id or user_info.role.role_name == 'admin'
 
-    def delete(self, request,pk, *args, **kwargs): # needed permission
+    def delete(self, request,pk, *args, **kwargs):
         user_info = get_user_info_from_headers(request.headers)
         social_media_instance = Social_media.objects.get(id=pk)
 
@@ -198,7 +198,7 @@ class Social_mediaInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
         else:
             return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request,pk, *args, **kwargs):# needed permission
+    def put(self, request,pk, *args, **kwargs):
         user_info = get_user_info_from_headers(request.headers)
         social_media_instance = Social_media.objects.get(id=pk)
 
@@ -209,11 +209,22 @@ class Social_mediaInstanceDeletePut(mixins.UpdateModelMixin, mixins.DestroyModel
 class SlotInstance(APIView):#restricted
     permission_classes = [IsAuthenticated]
 
+    def not_client(self,user_info):
+        return user_info.role.role_name != 'client'
+
+    def is_owner_or_admin(self, instance_owner, user_info):
+        return instance_owner == user_info.id or user_info.role.role_name == 'admin'
+
     def post(self, request, format=None): # needed permission
-        serializer = SlotModelPostPutSerializer(data = request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status = status.HTTP_201_CREATED)
+        intance_owner = request.data['owner']
+        user_info = get_user_info_from_headers(request.headers)
+
+        if self.not_client(user_info=user_info):
+            serializer = SlotModelPostPutSerializer(data = request.data)
+            if serializer.is_valid() and self.is_owner_or_admin(intance_owner, user_info):
+                serializer.save()
+                return Response(serializer.data, status = status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class SlotInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):# restricted
@@ -224,7 +235,7 @@ class SlotInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin, ge
     def is_owner_or_admin(self, model_instance, user_info):
         return model_instance.owner.id == user_info.id or user_info.role.role_name == 'admin'
 
-    def delete(self, request,pk, *args, **kwargs): # needed permission
+    def delete(self, request,pk, *args, **kwargs): 
         user_info = get_user_info_from_headers(request.headers)
         slot = Slot.objects.get(id=pk)
 
@@ -233,7 +244,7 @@ class SlotInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin, ge
         else:
             return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, pk, *args, **kwargs):# needed permission
+    def put(self, request, pk, *args, **kwargs):
         user_info = get_user_info_from_headers(request.headers)
         slot = Slot.objects.get(id=pk)
 
@@ -257,7 +268,7 @@ class WriterInstance(mixins.RetrieveModelMixin, generics.GenericAPIView):# publi
     def get(self, request,*args, **kwargs):
         return self.retrieve(self, request,*args, **kwargs)
     
-class SlotList(generics.ListAPIView): # should filter by date, avalability , and owner, public
+class SlotList(generics.ListAPIView):
     serializer_class = SlotModelSerializer
     permission_classes = [IsAuthenticated]
 
@@ -275,7 +286,7 @@ class SlotList(generics.ListAPIView): # should filter by date, avalability , and
         return filter_results_depending_on_role(self.request.headers, admin_action=admin_action, client_action=client_action, psico_action=psico_action)
 
 
-class PaymentList(generics.ListAPIView): # should filter by date, owner and some filters more
+class PaymentList(generics.ListAPIView):
     serializer_class = PaymentModelSerializer
     permission_classes = [IsAuthenticated]
 
@@ -285,11 +296,9 @@ class PaymentList(generics.ListAPIView): # should filter by date, owner and some
             return Payment.objects.all()
 
         def client_action(user_info):
-            # return all the payment of the certain client
             return Payment.objects.filter(owner=user_info.id)
         
         def psico_action(user_info):
-            # has not permission
             return Payment.objects.none()
 
         return filter_results_depending_on_role(self.request.headers, admin_action=admin_action, client_action=client_action, psico_action=psico_action)
@@ -298,12 +307,21 @@ class PaymentInstance(APIView): # this should be protected
     permission_classes = [IsAuthenticated]
     serializer_class = PaymentModelSerializer
 
+    def not_psico(self,user_info):
+        return user_info.role.role_name != 'psico'
+    
+    def is_owner_or_admin(self, instance_owner, user_info):
+        return instance_owner == user_info.id or user_info.role.role_name == 'admin'
     
     def post(self, request,format=None): # needed permission
+        intance_owner = request.data['owner']
+        user_info = get_user_info_from_headers(request.headers)
         serializer = Pay_ReferencePostPutModelSerializer(data = request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status = status.HTTP_201_CREATED)
+        if self.not_psico(user_info):
+            if serializer.is_valid() or self.is_owner_or_admin(intance_owner,user_info):
+                serializer.save()
+                return Response(serializer.data, status = status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class PaymentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView): # restricted
     queryset = Payment.objects.all()
@@ -333,11 +351,23 @@ class PaymentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin,
 
 class AppointmentInstance(APIView): # restricted
     permission_classes = [IsAuthenticated]
+
+    def not_psico(self,user_info):
+        return user_info.role.role_name != 'psico'
+    
+    def is_owner_or_admin(self, instance_owner, user_info):
+        return instance_owner == user_info.id or user_info.role.role_name == 'admin'
+    
     def post(self, request, format=None): # needed permission
         serializer = AppointmentPostPutSerializer(data = request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status = status.HTTP_201_CREATED)
+        intance_owner = request.data['owner']
+        user_info = get_user_info_from_headers(request.headers)
+
+        if self.not_psico(user_info):
+            if serializer.is_valid() or self.is_owner_or_admin(intance_owner,user_info):
+                serializer.save()
+                return Response(serializer.data, status = status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class AppointmentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView): # restricted
@@ -348,7 +378,7 @@ class AppointmentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMi
     def is_owner_or_admin(self, model_instance, user_info):
         return model_instance.client.id == user_info.id or user_info.role.role_name == 'admin'
 
-    def delete(self, request,pk, *args, **kwargs): # needed permission
+    def delete(self, request,pk, *args, **kwargs):
         user_info = get_user_info_from_headers(request.headers)
         appointment = Appointment.objects.get(id=pk)
 
@@ -357,7 +387,7 @@ class AppointmentInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMi
         else:
             return Response("You cannot delete this item", status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request,pk, *args, **kwargs):# needed permission
+    def put(self, request,pk, *args, **kwargs):
         user_info = get_user_info_from_headers(request.headers)
         appointment = Appointment.objects.get(id=pk)
 
@@ -381,5 +411,3 @@ class AppointmentList(generics.ListAPIView): # should filter by date, owner and 
             return Appointment.objects.filter(host=user_info)
 
         return filter_results_depending_on_role(self.request.headers, admin_action=admin_action, client_action=client_action, psico_action=psico_action)
-
-
