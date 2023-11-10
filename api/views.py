@@ -144,7 +144,7 @@ class Phone_numberInstance(APIView):
     permission_classes = [IsAuthenticated]
     
     def is_owner_or_admin(self, instance_owner, user_info):
-        return instance_owner == user_info.id or user_info.role.role_name == 'admin'
+        return instance_owner == str(user_info.id) or user_info.role.role_name == 'admin'
 
     def post(self, request, format=None):
         intance_owner = request.data['owner']
