@@ -325,6 +325,7 @@ class PaymentInstance(APIView): # this should be protected
         user_info = get_user_info_from_headers(request.headers)
         if self.not_psico(user_info):
             intance_owner = request.data['owner']
+            print(request.data)
             serializer = Pay_ReferencePostPutModelSerializer(data = request.data)
 
             if serializer.is_valid() and self.is_owner_or_admin(intance_owner,user_info):

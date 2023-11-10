@@ -51,10 +51,11 @@ class AppointmentTypeModelSerializer(serializers.HyperlinkedModelSerializer): # 
 
 class Pay_ReferencePostPutModelSerializer(serializers.HyperlinkedModelSerializer):
     method = serializers.PrimaryKeyRelatedField(queryset=Pay_method.objects.all())
-    product = serializers.PrimaryKeyRelatedField(queryset=Appointment_type.objects.all()) 
+    product = serializers.PrimaryKeyRelatedField(queryset=Appointment_type.objects.all())
+    owner =  serializers.PrimaryKeyRelatedField(queryset=User_Info.objects.all())
     class Meta:
         model = Payment
-        fields = ['method', 'transaction_code', 'product']
+        fields = ['method', 'transaction_code', 'product', 'owner']
 
 
 class PaymentModelSerializer(serializers.HyperlinkedModelSerializer): # listo el view
