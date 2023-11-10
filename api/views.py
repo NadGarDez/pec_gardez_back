@@ -213,19 +213,22 @@ class SlotInstance(APIView):#restricted
         return user_info.role.role_name != 'client'
 
     def is_owner_or_admin(self, instance_owner, user_info):
-        return instance_owner == user_info.id or user_info.role.role_name == 'admin'
+        return instance_owner == str(user_info.id) or user_info.role.role_name == 'admin' 
 
     def post(self, request, format=None): # needed permission
-        intance_owner = request.data['owner']
         user_info = get_user_info_from_headers(request.headers)
 
         if self.not_client(user_info=user_info):
             serializer = SlotModelPostPutSerializer(data = request.data)
+            intance_owner = request.data['owner']
             if serializer.is_valid() and self.is_owner_or_admin(intance_owner, user_info):
                 serializer.save()
                 return Response(serializer.data, status = status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                if serializer.errors:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response("You cannot create this item", status=status.HTTP_400_BAD_REQUEST)
+        return Response("You cannot create this item", status=status.HTTP_400_BAD_REQUEST)
 
 class SlotInstance_PutPost(mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):# restricted
     queryset = Slot.objects.all()
