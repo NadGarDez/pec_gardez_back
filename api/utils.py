@@ -1,5 +1,6 @@
 from rest_framework_simplejwt.tokens import AccessToken
 from .models import User_Info
+from datetime import date, timedelta
 
 def get_user_id_from_token(token):
     token_object = AccessToken(token)
@@ -34,3 +35,21 @@ def filter_results_depending_on_role(headers, admin_action, client_action, psico
        
     else:
         return psico_action(user_info)
+
+def num_of_days(start_date, end_date):
+    date_a = date.fromisoformat(start_date)
+    date_b = date.fromisoformat(end_date)
+
+    return (date_b-date_a).days + 1
+
+def dates_array(num_of_days, start_date):
+    days = list()
+    current_date=date.fromisoformat(start_date)
+    for i in range(num_of_days):
+        if i > 0:
+            delta = timedelta(days=1)
+            current_date = current_date + delta
+            
+        days.append(current_date)
+    return days
+

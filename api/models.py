@@ -94,6 +94,7 @@ class Payment(models.Model): # listo el serializer
     transaction_code = models.CharField(max_length=255)
     product =  models.ForeignKey(Appointment_type,on_delete=models.CASCADE)
     owner =  models.ForeignKey(User_Info, on_delete=models.CASCADE)
+    verified = models.BooleanField(default=False, blank=True, null=True)
     def __str__(self):
         return "Payment: " + str(self.id)
 

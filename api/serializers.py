@@ -136,5 +136,19 @@ class AppointmentPostPutSerializer(serializers.HyperlinkedModelSerializer):
         model = Appointment
         fields = ['host','client','slot','pay_reference','meet_url','appointment_type']
 
+class SlotCreatorSerializer(serializers.Serializer):
+    owner = serializers.IntegerField()
+    start_date = serializers.DateField()
+    end_date = serializers.DateField()
+    time_breake = serializers.IntegerField(required=False, default=0)
+    start_day = serializers.TimeField()
+    end_day = serializers.TimeField()
+    slot_time =  serializers.IntegerField()
+
+    def create(self, validated_data):
+        
+        return False
+ 
+
 
 # http POST http://localhost:8000/api/appointment/ host=3 client=1 slot=1 meet_url=https://www.google.com appointment_type=1

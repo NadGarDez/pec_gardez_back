@@ -1,12 +1,12 @@
 from django.shortcuts import render
-from .serializers import BookModelSerializer, ArticleModelSerializer, AppointmentTypeModelSerializer, RoleModelSerializer, Pay_MethodModelSerializer, User_infoModelSerializer, Social_mediaModelSerializer, Phone_numberModelSerializer, TagModelSerializer, WriterModelSerializer, SlotModelSerializer, PaymentModelSerializer,Phone_numberModelPostPutSerializer,Social_mediaModelPostPutSerializer, SlotModelPostPutSerializer, AppointmentPostPutSerializer, Pay_ReferencePostPutModelSerializer,AppointmentModelSerializer
+from .serializers import BookModelSerializer, ArticleModelSerializer, AppointmentTypeModelSerializer, RoleModelSerializer, Pay_MethodModelSerializer, User_infoModelSerializer, Social_mediaModelSerializer, Phone_numberModelSerializer, TagModelSerializer, WriterModelSerializer, SlotModelSerializer, PaymentModelSerializer,Phone_numberModelPostPutSerializer,Social_mediaModelPostPutSerializer, SlotModelPostPutSerializer, AppointmentPostPutSerializer, Pay_ReferencePostPutModelSerializer,AppointmentModelSerializer,SlotCreatorSerializer
 from rest_framework import viewsets, status, generics, mixins
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Book, Article, Appointment_type, Role, Pay_method, User_Info, Social_media, Phone_number, Tag, Slot, Writer, Payment, Appointment
-from .utils import filter_results_depending_on_role, get_user_id_from_token, get_token_from_headers, get_user_info_from_user_id,get_user_info_from_headers
-
+from .utils import filter_results_depending_on_role, get_user_id_from_token, get_token_from_headers, get_user_info_from_user_id,get_user_info_from_headers, num_of_days, dates_array
+from datetime import time, timedelta, datetime
 
 # Public views
 class BookList(generics.ListAPIView):
@@ -433,3 +433,89 @@ class AppointmentList(generics.ListAPIView): # should filter by date, owner and 
             return Appointment.objects.filter(host=user_info)
 
         return filter_results_depending_on_role(self.request.headers, admin_action=admin_action, client_action=client_action, psico_action=psico_action)
+
+
+##
+# #def create_zoom_meeting(request):
+#     # Initialize Zoom API client with your credentials
+#     zoom_client = ZoomClient(api_key='YOUR_ZOOM_API_KEY', api_secret='YOUR_ZOOM_API_SECRET')
+
+#     # Create Zoom meeting parameters
+#     meeting_params = {
+#         "topic": "My Meeting",
+#         "type": 2,
+#         "start_time": "2023-11-11T10:00:00",
+#         "duration": 60,
+#         "timezone": "America/New_York",
+#         "password": "123456"
+#     }
+
+#     # Create the Zoom meeting
+#     meeting = zoom_client.meetings.create(**meeting_params)
+
+#     # Generate join URL for the meeting
+#     join_url = meeting['join_url']
+
+#     # Send email invitations to participants
+#     # Replace 'participants' with a list of email addresses
+#     participants = ['participant1@email.com', 'participant2@email.com']
+#     for participant in participants:
+#         send_zoom_meeting_invitation(participant, join_url)
+
+#     return HttpResponse('Meeting created successfully!')
+
+# ##
+class SlotCreator(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def not_client(self,user_info):
+        return user_info.role.role_name != 'client'
+
+
+    def post(self, request, format=None): # needed permission
+        user_info = get_user_info_from_headers(request.headers)
+        if self.not_client(user_info):
+            serializer = SlotCreatorSerializer(data = request.data)
+            if serializer.is_valid():
+                # here start the algorithm
+                
+                num_days = num_of_days(request.data['start_date'], request.data['end_date'])
+
+                dates = dates_array(num_days, request.data['start_date'])
+
+                start_day = request.data['start_day'].split(":")
+                end_day =  request.data["end_day"].split(":")
+
+                for date in dates:
+                    start_work_date= datetime.combine(date, time(hour=int(start_day[0]), minute=int(start_day[1]))) 
+                    end_work_date = datetime.combine(date, time(hour=int(end_day[0]), minute=int(end_day[1])))
+
+                    current_time =  start_work_date
+                    while current_time < end_work_date:
+                        slot_duration = timedelta(minutes=int(request.data['slot_duration']))
+                        current_time = current_time + slot_duration
+                        print(current_time, "current time")
+
+
+                # current_date = request.data["start_date"]
+                # end_day =  request.data["end_day"].split(":")
+                # initial_time = request.data['start_day'].split(":")
+
+                # for i in range(num_days):
+
+                #     current_time = datetime.combine(datetime.now(), time(hour=int(initial_time[0]), minute=int(initial_time[1]))) 
+                #     current_end_date = datetime.combine(datetime.now(), time(hour=int(end_day[0]), minute=int(end_day[1]))) 
+                #     slot_duration = timedelta(minutes=int(request.data['slot_duration']))
+                #     result = current_time + slot_duration
+                #     print(current_time, current_end_date)
+                #     if result < current_end_date:
+                #         print("is less")
+
+                    
+                #     # if current time plus slot time is less than end day
+                #     # create an slot 
+                #     # plus slot time to current time
+                #     number_of_hours = 3
+
+                return Response("Fucking error", status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -37,5 +37,6 @@ urlpatterns = [
     path("payment/<int:pk>/", views.PaymentInstance_PutPost.as_view(),  name="payment_put_post"),
     path("payment/", views.PaymentInstance.as_view(), name='payment_post'),
     path("token/",TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh")
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("slot_creator/", views.SlotCreator.as_view(), name="slot_creator"),
 ]
