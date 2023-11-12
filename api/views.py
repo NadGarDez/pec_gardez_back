@@ -6,7 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Book, Article, Appointment_type, Role, Pay_method, User_Info, Social_media, Phone_number, Tag, Slot, Writer, Payment, Appointment
 from .utils import filter_results_depending_on_role, get_user_id_from_token, get_token_from_headers, get_user_info_from_user_id,get_user_info_from_headers, num_of_days, dates_array
-from datetime import time, timedelta, datetime
+from datetime import time, timedelta, datetime, date
+from django.db.models import Q
 
 # Public views
 class BookList(generics.ListAPIView):
@@ -470,52 +471,65 @@ class SlotCreator(APIView):
     
     def not_client(self,user_info):
         return user_info.role.role_name != 'client'
+    
+    def is_owner_or_admin(self, instance_owner, user_info):
+        return instance_owner == str(user_info.id) or user_info.role.role_name == 'admin'
 
 
     def post(self, request, format=None): # needed permission
         user_info = get_user_info_from_headers(request.headers)
         if self.not_client(user_info):
             serializer = SlotCreatorSerializer(data = request.data)
-            if serializer.is_valid():
+            if serializer.is_valid() and self.is_owner_or_admin(request.data['owner'], user_info):
                 # here start the algorithm
-                
+
                 num_days = num_of_days(request.data['start_date'], request.data['end_date'])
 
                 dates = dates_array(num_days, request.data['start_date'])
 
-                start_day = request.data['start_day'].split(":")
+                start_day = request.data['start_day'].split(":") # if start date is less than today return error
                 end_day =  request.data["end_day"].split(":")
+                
 
                 for date in dates:
+                    if date < date.today():
+                        return Response({'message':'You are trying to create slots with past dates, check the supplied dates', 'status':200}, status=status.HTTP_400_BAD_REQUEST)
                     start_work_date= datetime.combine(date, time(hour=int(start_day[0]), minute=int(start_day[1]))) 
                     end_work_date = datetime.combine(date, time(hour=int(end_day[0]), minute=int(end_day[1])))
 
                     current_time =  start_work_date
                     while current_time < end_work_date:
+                        validation_1 = Q(start_date=str(current_time))
+                        validation_2=Q(owner=int(request.data['owner']))
+                        check_duplicated_slots = Slot.objects.filter(validation_1 & validation_2)
+
+                        if check_duplicated_slots.count() > 0:
+                            return Response({'message':'Exist duplicated instance of slots, check the supplied dates', 'status':400}, status=status.HTTP_400_BAD_REQUEST)
+
                         slot_duration = timedelta(minutes=int(request.data['slot_duration']))
-                        current_time = current_time + slot_duration
-                        print(current_time, "current time")
+                        slot_end_data_time = current_time + slot_duration
+                        slot = Slot()
+                        slot.owner = User_Info.objects.get(pk=request.data['owner'])
+                        slot.start_date = str(current_time)
+                        slot.available = True
+                        slot.end_date = slot_end_data_time
+                        slot.time_in_minutes = int(request.data['slot_duration'])
+                        slot.save()
+                        current_time = slot_end_data_time
 
+                        try:
+                            time_break = timedelta(minutes=int(request.data['time_break']))
+                            if current_time + time_break < end_work_date:
 
-                # current_date = request.data["start_date"]
-                # end_day =  request.data["end_day"].split(":")
-                # initial_time = request.data['start_day'].split(":")
+                                current_time = current_time + time_break
+                        except KeyError:
+                            pass
+                
+                return Response({'message':"All the slot created succesfully", 'status':201}, status = status.HTTP_201_CREATED)
 
-                # for i in range(num_days):
-
-                #     current_time = datetime.combine(datetime.now(), time(hour=int(initial_time[0]), minute=int(initial_time[1]))) 
-                #     current_end_date = datetime.combine(datetime.now(), time(hour=int(end_day[0]), minute=int(end_day[1]))) 
-                #     slot_duration = timedelta(minutes=int(request.data['slot_duration']))
-                #     result = current_time + slot_duration
-                #     print(current_time, current_end_date)
-                #     if result < current_end_date:
-                #         print("is less")
-
-                    
-                #     # if current time plus slot time is less than end day
-                #     # create an slot 
-                #     # plus slot time to current time
-                #     number_of_hours = 3
-
-                return Response("Fucking error", status=status.HTTP_400_BAD_REQUEST)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                if serializer.errors:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return Response({'message':"You cannot create these items", 'status':400}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message':"You cannot create these items", 'status':400}, status=status.HTTP_400_BAD_REQUEST)
