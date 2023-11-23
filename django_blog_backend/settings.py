@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-(a=+@$we-wd2jb9@5o*g6x(t@5k%5mwl8@m&)f-r&&45a8pn1s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [os.environ.get("HOST_IP", "192.168.1.1"),"127.0.0.1:5432",'localhost']
+ALLOWED_HOSTS = [os.environ.get("HOST_IP", "192.168.1.1"),"127.0.0.1:5432",'localhost', os.environ.get("AWS_DNS", "192.168.1.1")]
 
 
 # Application definition
