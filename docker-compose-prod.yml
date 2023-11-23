@@ -25,6 +25,7 @@ services:
       - POSTGRES_NAME=pec_gardez_database
       - POSTGRES_USER=pec_gardez_default_user
       - POSTGRES_PASSWORD=abcdqñ
+      - DB_PORT=5432
     depends_on:
       - db
   nginx: 
